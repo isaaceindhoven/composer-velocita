@@ -40,7 +40,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
             if (substr($url, 0, strlen($prefix)) === $prefix) {
                 $replacement = sprintf(
                     '%s/%s',
-                    rtrim($config->getUrl(), '/'),
+                    rtrim($config->getURL(), '/'),
                     ltrim($mapping->getPath(), '/')
                 );
                 $url = sprintf(
@@ -64,7 +64,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
     protected function getVelocitaOrigin(): string
     {
         $config = $this->plugin->getConfiguration();
-        return parse_url($config->getUrl(), PHP_URL_HOST);
+        return parse_url($config->getURL(), PHP_URL_HOST);
     }
 
     public function getContents($originUrl, $fileUrl, $progress = true, $options = [])

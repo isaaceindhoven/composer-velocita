@@ -5,6 +5,7 @@ namespace ISAAC\Velocita\Composer\Plugins;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
+use Composer\Plugin\Capable;
 use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PreFileDownloadEvent;
@@ -12,7 +13,7 @@ use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
 
-class VelocitaPlugin implements PluginInterface, EventSubscriberInterface
+class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     protected const CONFIG_FILE = 'velocita.json';
 
@@ -22,28 +23,50 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface
     /** @var IOInterface */
     protected $io;
 
+    /** @var string */
+    protected $configPath;
+
     /** @var PluginConfig */
     protected $config = null;
 
     /** @var Endpoints */
     protected $endpoints = null;
 
-    /**
-     * @param Composer $composer
-     * @param IOInterface $io
-     */
-    public function activate(Composer $composer, IOInterface $io)
+    public function activate(Composer $composer, IOInterface $io): void
     {
         $this->composer = $composer;
         $this->io = $io;
+
+        $this->configPath = sprintf('%s/.composer/%s', getenv('HOME'), self::CONFIG_FILE);
+    }
+
+    public function getCapabilities(): array
+    {
+        return [
+            'Composer\\Plugin\\Capability\\CommandProvider' => 'ISAAC\\Velocita\\Composer\\Commands\\CommandProvider',
+        ];
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        $method = 'onPreFileDownload';
+        $priority = 0;
+
+        // Subscribe to PRE_FILE_DOWNLOAD
+        return [
+            PluginEvents::PRE_FILE_DOWNLOAD => [
+                [$method, $priority],
+            ],
+        ];
     }
 
     protected function loadConfiguration(): PluginConfig
     {
-        $configPath = sprintf('%s/.composer/%s', getenv('HOME'), self::CONFIG_FILE);
-        if (is_readable($configPath)) {
-            $data = json_decode(file_get_contents($configPath), true);
-        } else {
+        $data = null;
+        if (is_readable($this->configPath)) {
+            $data = json_decode(file_get_contents($this->configPath), true);
+        }
+        if (!is_array($data)) {
             $data = [];
         }
         return PluginConfig::fromArray($data);
@@ -57,10 +80,15 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface
         return $this->config;
     }
 
+    public function writeConfiguration(PluginConfig $config): void
+    {
+        file_put_contents($this->configPath, json_encode($config->toArray()));
+    }
+
     protected function loadEndpoints(): Endpoints
     {
         $config = $this->getConfiguration();
-        $endpointsURL = sprintf('%s/endpoints', $config->getUrl());
+        $endpointsURL = sprintf('%s/endpoints', $config->getURL());
         $data = json_decode(file_get_contents($endpointsURL), true);
         return Endpoints::fromArray($data);
     }
@@ -73,19 +101,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface
         return $this->endpoints;
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        // Subscribe to PRE_FILE_DOWNLOAD
-        $method = 'onPreFileDownload';
-        $priority = 0;
-        return [
-            PluginEvents::PRE_FILE_DOWNLOAD => [
-                [$method, $priority],
-            ],
-        ];
-    }
-
-    public function onPreFileDownload(PreFileDownloadEvent $event)
+    public function onPreFileDownload(PreFileDownloadEvent $event): void
     {
         // Don't do anything if we're disabled
         $config = $this->getConfiguration();
