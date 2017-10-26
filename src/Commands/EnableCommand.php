@@ -39,9 +39,6 @@ class EnableCommand extends BaseCommand
             $config->setURL($url);
         }
 
-        // Validate
-        $config->validate();
-
         // Write new configuration
         $this->plugin->writeConfiguration($config);
 

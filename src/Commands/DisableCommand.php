@@ -32,9 +32,6 @@ class DisableCommand extends BaseCommand
         $config = $this->plugin->getConfiguration();
         $config->setEnabled(false);
 
-        // Validate
-        $config->validate();
-
         // Write new configuration
         $this->plugin->writeConfiguration($config);
 

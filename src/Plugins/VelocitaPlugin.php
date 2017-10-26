@@ -82,6 +82,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     public function writeConfiguration(PluginConfig $config): void
     {
+        $config->validate();
         file_put_contents($this->configPath, json_encode($config->toArray()));
     }
 
