@@ -4,6 +4,13 @@
     "keywords": ["composer", "cache", "performance", "speed", "velocita"],
     "type": "composer-plugin",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Jelle Raaijmakers",
+            "email": "jelle.raaijmakers@isaac.nl",
+            "homepage": "https://www.isaac.nl"
+        }
+    ],
     "require": {
         "php": ">=7.1",
         "composer-plugin-api": "^1.1.0"
