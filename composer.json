@@ -1,5 +1,7 @@
 {
     "name": "isaac/composer-velocita",
+    "description": "Composer plugin that rewrites downloads to a Velocita server",
+    "keywords": ["composer", "cache", "performance", "speed", "velocita"],
     "type": "composer-plugin",
     "license": "MIT",
     "require": {
