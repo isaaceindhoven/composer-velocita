@@ -8,6 +8,7 @@ Use a Velocita Composer caching instance transparently for all your projects.
 
 * PHP 7.1 or newer
 * Composer
+* A running [Velocita](https://github.com/isaaceindhoven/velocita) instance
 
 ### Installing
 
