@@ -1,6 +1,6 @@
 # Velocita Composer plugin
 
-Use a Velocita Composer caching instance transparently for all your projects.
+A Composer plugin that enables transparent Velocita caching for your projects.
 
 ## Getting Started
 
@@ -12,8 +12,8 @@ Use a Velocita Composer caching instance transparently for all your projects.
 
 ### Installing
 
-Installation and configuration of the Velocita plugin is global, which means you can use it for all projects that use
-Composer without having to install it separately.
+Installation and configuration of the Velocita plugin is global, so you can use it for all projects that use Composer
+without having to add it as a requirement to your `composer.json`.
 
 ```
 composer global require isaac/composer-velocita
