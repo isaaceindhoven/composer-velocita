@@ -20,6 +20,11 @@ composer global require isaac/composer-velocita
 composer velocita:enable https://url.to.your.velocita.tld/
 ```
 
+### Usage
+
+After enabling and configuring the Velocita plugin, it is automatically used for all Composer projects when running
+`require`, `update`, `install`, etcetera.
+
 ### Disabling
 
 Disable the plugin by executing:
