@@ -22,7 +22,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
         $this->plugin = $plugin;
     }
 
-    protected function patchURL($url): string
+    protected function patchURL(string $url): string
     {
         $config = $this->plugin->getConfiguration();
         $endpoints = $this->plugin->getEndpoints();
@@ -61,25 +61,15 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
         return $url;
     }
 
-    protected function getVelocitaOrigin(): string
+    public function copy($originUrl, $fileUrl, $fileName, $progress = true, $options = [])
     {
-        $config = $this->plugin->getConfiguration();
-        return parse_url($config->getURL(), PHP_URL_HOST);
+        $patchedUrl = $this->patchURL($fileUrl);
+        parent::copy($originUrl, $patchedUrl, $fileName, $progress, $options);
     }
 
     public function getContents($originUrl, $fileUrl, $progress = true, $options = [])
     {
-        $patchedOrigin = $this->getVelocitaOrigin();
         $patchedUrl = $this->patchURL($fileUrl);
-
         return parent::getContents($originUrl, $patchedUrl, $progress, $options);
-    }
-
-    public function copy($originUrl, $fileUrl, $fileName, $progress = true, $options = [])
-    {
-        $patchedOrigin = $this->getVelocitaOrigin();
-        $patchedUrl = $this->patchURL($fileUrl);
-
-        parent::copy($originUrl, $patchedUrl, $fileName, $progress, $options);
     }
 }
