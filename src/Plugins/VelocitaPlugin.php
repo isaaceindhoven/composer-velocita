@@ -91,7 +91,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         // Ensure parent directory exists
         $configDir = dirname($this->configPath);
         if (!is_dir($configDir)) {
-            mkdir($configDir);
+            mkdir($configDir, 0777, true);
         }
 
         file_put_contents($this->configPath, json_encode($config->toArray()));
