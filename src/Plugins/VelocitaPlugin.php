@@ -12,6 +12,7 @@ use Composer\Plugin\PreFileDownloadEvent;
 use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
 use ISAAC\Velocita\Composer\Exceptions\CommunicationException;
+use ISAAC\Velocita\Composer\Util\ComposerFactory;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
 
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
@@ -38,7 +39,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $this->composer = $composer;
         $this->io = $io;
 
-        $this->configPath = sprintf('%s/.composer/%s', getenv('HOME'), self::CONFIG_FILE);
+        $this->configPath = sprintf('%s/%s', ComposerFactory::getHomeDir(), self::CONFIG_FILE);
     }
 
     public function getCapabilities(): array
