@@ -5,10 +5,12 @@ namespace ISAAC\Velocita\Composer\Plugins;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
+use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PreFileDownloadEvent;
+use ISAAC\Velocita\Composer\Commands\CommandProvider;
 use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
 use ISAAC\Velocita\Composer\Exceptions\CommunicationException;
@@ -45,7 +47,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
     public function getCapabilities(): array
     {
         return [
-            'Composer\\Plugin\\Capability\\CommandProvider' => 'ISAAC\\Velocita\\Composer\\Commands\\CommandProvider',
+            ComposerCommandProvider::class => CommandProvider::class,
         ];
     }
 
