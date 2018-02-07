@@ -11,6 +11,7 @@ use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PreFileDownloadEvent;
 use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
+use ISAAC\Velocita\Composer\Exceptions\CommunicationException;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
 
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
@@ -90,8 +91,17 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
     {
         $config = $this->getConfiguration();
         $endpointsURL = sprintf('%s/endpoints', $config->getURL());
-        $data = json_decode(file_get_contents($endpointsURL), true);
-        return Endpoints::fromArray($data);
+        $endpointsJSON = file_get_contents($endpointsURL);
+        if ($endpointsJSON === false) {
+            throw new CommunicationException('Unable to retrieve endpoints configuration from Velocita');
+        }
+        $endpoints = json_decode($endpointsJSON, true);
+        if (!is_array($endpoints)) {
+            throw new CommunicationException(
+                sprintf('Invalid JSON structure retrieved (#%d: %s)', json_last_error(), json_last_error_msg())
+            );
+        }
+        return Endpoints::fromArray($endpoints);
     }
 
     public function getEndpoints(): Endpoints
