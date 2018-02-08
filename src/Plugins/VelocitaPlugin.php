@@ -75,7 +75,11 @@ class VelocitaPlugin implements VelocitaPluginInterface, EventSubscriberInterfac
             $this->handlePreFileDownloadEvent($event);
         } catch (\Exception $e) {
             $this->io->writeError(
-                sprintf("Velocita: exception thrown in event handler: %s\n%s", $e->getMessage(), $e->getTraceAsString())
+                sprintf(
+                    "<error>Velocita: exception thrown in event handler: %s\n%s</error>",
+                    $e->getMessage(),
+                    $e->getTraceAsString()
+                )
             );
             throw $e;
         }
