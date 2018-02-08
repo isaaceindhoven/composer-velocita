@@ -8,7 +8,6 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginEvents;
-use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PreFileDownloadEvent;
 use ISAAC\Velocita\Composer\Commands\CommandProvider;
 use ISAAC\Velocita\Composer\Config\Endpoints;
@@ -17,7 +16,7 @@ use ISAAC\Velocita\Composer\Exceptions\IOException;
 use ISAAC\Velocita\Composer\Util\ComposerFactory;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
 
-class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
+class VelocitaPlugin implements VelocitaPluginInterface, EventSubscriberInterface, Capable
 {
     protected const CONFIG_FILE = 'velocita.json';
 
