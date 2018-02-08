@@ -68,11 +68,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
         }
 
         if ($patchedUrl !== $url) {
-            $this->io->write(
-                sprintf('Velocita: rewrote "%s" to "%s"', $url, $patchedUrl),
-                true,
-                IOInterface::VERBOSE
-            );
+            $this->io->write(sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
         }
 
         return $patchedUrl;
@@ -80,12 +76,16 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
 
     public function copy($originUrl, $fileUrl, $fileName, $progress = true, $options = [])
     {
+        $this->io->write(sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true, IOInterface::DEBUG);
+
         $patchedUrl = $this->patchURL($fileUrl);
         parent::copy($originUrl, $patchedUrl, $fileName, $progress, $options);
     }
 
     public function getContents($originUrl, $fileUrl, $progress = true, $options = [])
     {
+        $this->io->write(sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true,IOInterface::DEBUG);
+
         $patchedUrl = $this->patchURL($fileUrl);
         return parent::getContents($originUrl, $patchedUrl, $progress, $options);
     }
