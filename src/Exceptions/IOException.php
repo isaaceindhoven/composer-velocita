@@ -2,6 +2,6 @@
 
 namespace ISAAC\Velocita\Composer\Exceptions;
 
-class CommunicationException extends \RuntimeException
+class IOException extends \RuntimeException
 {
 }
