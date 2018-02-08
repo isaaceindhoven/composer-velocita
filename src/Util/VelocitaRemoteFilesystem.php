@@ -67,6 +67,14 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
             $patchedUrl = substr($patchedUrl, 0, -strlen($suffix)) . '/' . self::VELOCITA_JSON_FILE;
         }
 
+        if ($patchedUrl !== $url) {
+            $this->io->write(
+                sprintf('Velocita: rewrote "%s" to "%s"', $url, $patchedUrl),
+                true,
+                IOInterface::VERBOSE
+            );
+        }
+
         return $patchedUrl;
     }
 
