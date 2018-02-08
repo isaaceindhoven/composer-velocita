@@ -64,6 +64,41 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         ];
     }
 
+    public function onPreFileDownload(PreFileDownloadEvent $event): void
+    {
+        /*
+         * Handle all exceptions that ::handlePreFileDownloadEvent() might throw at us by being verbose about it.
+         *
+         * Unfortunately we need to do this; at least in Composer 1.6.3 EventDispatcher ignores exceptions causing its
+         * circular invocation detection to trigger as soon as a second event of the same type is dispatched.
+         */
+        try {
+            $this->handlePreFileDownloadEvent($event);
+        } catch (\Exception $e) {
+            $this->io->writeError(
+                sprintf("Velocita: exception thrown in event handler: %s\n%s", $e->getMessage(), $e->getTraceAsString())
+            );
+            throw $e;
+        }
+    }
+
+    protected function handlePreFileDownloadEvent(PreFileDownloadEvent $event): void
+    {
+        // Don't do anything if we're disabled
+        $config = $this->getConfiguration();
+        if (!$config->isEnabled()) {
+            return;
+        }
+
+        $rfs = new VelocitaRemoteFilesystem(
+            $this,
+            $this->io,
+            $this->composer->getConfig(),
+            $event->getRemoteFilesystem()->getOptions()
+        );
+        $event->setRemoteFilesystem($rfs);
+    }
+
     protected function loadConfiguration(): PluginConfig
     {
         $data = null;
@@ -120,22 +155,5 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             $this->endpoints = $this->loadEndpoints();
         }
         return $this->endpoints;
-    }
-
-    public function onPreFileDownload(PreFileDownloadEvent $event): void
-    {
-        // Don't do anything if we're disabled
-        $config = $this->getConfiguration();
-        if (!$config->isEnabled()) {
-            return;
-        }
-
-        $rfs = new VelocitaRemoteFilesystem(
-            $this,
-            $this->io,
-            $this->composer->getConfig(),
-            $event->getRemoteFilesystem()->getOptions()
-        );
-        $event->setRemoteFilesystem($rfs);
     }
 }
