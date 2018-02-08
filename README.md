@@ -33,6 +33,11 @@ Disable the plugin by executing:
 composer velocita:disable
 ```
 
+## Known issues
+
+* The `composer create-project` command initially downloads from Packagist directly, but will use Velocita for the
+  subsequent installation of dependencies. See [Composer issue #7090](https://github.com/composer/composer/issues/7090).
+
 ## Authors
 
 * Jelle Raaijmakers - [jelle.raaijmakers@isaac.nl](mailto:jelle.raaijmakers@isaac.nl) / [GMTA](https://github.com/GMTA)
