@@ -6,12 +6,12 @@ namespace ISAAC\Velocita\Composer\Util;
 
 use Composer\Factory;
 
-/**
- * ComposerFactory exposes some inaccessible functionality of Composer's Factory class.
- */
 class ComposerFactory extends Factory
 {
-    public static function getHomeDir(): string
+    /**
+     * Exposes the protected ComposerFactory::getHomeDir().
+     */
+    public static function getComposerHomeDir(): string
     {
         return parent::getHomeDir();
     }

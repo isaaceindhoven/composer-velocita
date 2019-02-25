@@ -12,7 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EnableCommand extends BaseCommand
 {
-    /** @var VelocitaPlugin */
+    /**
+     * @var VelocitaPlugin
+     */
     protected $plugin;
 
     public function __construct(VelocitaPlugin $plugin)

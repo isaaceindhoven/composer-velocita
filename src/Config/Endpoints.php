@@ -6,10 +6,13 @@ namespace ISAAC\Velocita\Composer\Config;
 
 class Endpoints
 {
-    /** @var EndpointMapping[] */
+    /**
+     * @var EndpointMapping[]
+     */
     protected $repositories = [];
-
-    /** @var EndpointMapping[] */
+    /**
+     * @var EndpointMapping[]
+     */
     protected $distributionChannels = [];
 
     public static function fromArray(array $data): Endpoints

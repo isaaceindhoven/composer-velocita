@@ -6,10 +6,13 @@ namespace ISAAC\Velocita\Composer\Config;
 
 class EndpointMapping
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $remoteURL;
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $path;
 
     public static function fromArray(array $data): EndpointMapping
@@ -23,6 +26,11 @@ class EndpointMapping
     public function getRemoteURL(): string
     {
         return $this->remoteURL;
+    }
+
+    public function getNormalizedRemoteURL(): string
+    {
+        return \sprintf('%s/', \rtrim($this->remoteURL, '/'));
     }
 
     public function getPath(): string

@@ -8,10 +8,13 @@ use Exception;
 
 class PluginConfig
 {
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $enabled;
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $url;
 
     public static function fromArray(array $data): PluginConfig

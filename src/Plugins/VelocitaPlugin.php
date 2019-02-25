@@ -19,23 +19,29 @@ use ISAAC\Velocita\Composer\Exceptions\IOException;
 use ISAAC\Velocita\Composer\Util\ComposerFactory;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
 
-class VelocitaPlugin implements VelocitaPluginInterface, EventSubscriberInterface, Capable
+class VelocitaPlugin implements EventSubscriberInterface, Capable
 {
     protected const CONFIG_FILE = 'velocita.json';
 
-    /** @var Composer */
+    /**
+     * @var Composer
+     */
     protected $composer;
-
-    /** @var IOInterface */
+    /**
+     * @var IOInterface
+     */
     protected $io;
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $configPath;
-
-    /** @var PluginConfig */
+    /**
+     * @var PluginConfig
+     */
     protected $config = null;
-
-    /** @var Endpoints */
+    /**
+     * @var Endpoints
+     */
     protected $endpoints = null;
 
     public function activate(Composer $composer, IOInterface $io): void
@@ -43,7 +49,7 @@ class VelocitaPlugin implements VelocitaPluginInterface, EventSubscriberInterfac
         $this->composer = $composer;
         $this->io = $io;
 
-        $this->configPath = \sprintf('%s/%s', ComposerFactory::getHomeDir(), self::CONFIG_FILE);
+        $this->configPath = \sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), self::CONFIG_FILE);
     }
 
     public function getCapabilities(): array
