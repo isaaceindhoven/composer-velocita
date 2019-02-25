@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ISAAC\Velocita\Composer\Util;
 
 use Composer\Config;
@@ -19,9 +21,12 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
     /** @var IOInterface */
     protected $io;
 
-    public function __construct(VelocitaPluginInterface $plugin, IOInterface $io, Config $config = null,
-                                array $options = [])
-    {
+    public function __construct(
+        VelocitaPluginInterface $plugin,
+        IOInterface $io,
+        Config $config = null,
+        array $options = []
+    ) {
         parent::__construct($io, $config, $options);
 
         $this->plugin = $plugin;
@@ -35,7 +40,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
         $patchedUrl = $url;
 
         /** @var EndpointMapping[] $mappings */
-        $mappings = array_merge(
+        $mappings = \array_merge(
             $endpoints->getRepositories(),
             $endpoints->getDistributionChannels()
         );
@@ -43,19 +48,19 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
         // Iterate over endpoints and find a matching prefix
         foreach ($mappings as $mapping) {
             // Normalize prefix
-            $prefix = rtrim($mapping->getRemoteURL(), '/') . '/';
+            $prefix = \rtrim($mapping->getRemoteURL(), '/') . '/';
 
             // Replace prefix if it matches with this endpoint
-            if (substr($url, 0, strlen($prefix)) === $prefix) {
-                $replacement = sprintf(
+            if (\substr($url, 0, \strlen($prefix)) === $prefix) {
+                $replacement = \sprintf(
                     '%s/%s',
-                    rtrim($config->getURL(), '/'),
-                    ltrim($mapping->getPath(), '/')
+                    \rtrim($config->getURL(), '/'),
+                    \ltrim($mapping->getPath(), '/')
                 );
-                $patchedUrl = sprintf(
+                $patchedUrl = \sprintf(
                     '%s/%s',
-                    rtrim($replacement, '/'),
-                    substr($url, strlen($prefix))
+                    \rtrim($replacement, '/'),
+                    \substr($url, \strlen($prefix))
                 );
                 break;
             }
@@ -63,20 +68,20 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
 
         // Map packages.json to packages-velocita.json
         $suffix = '/' . self::PACKAGES_JSON_FILE;
-        if (substr($patchedUrl, -strlen($suffix)) === $suffix) {
-            $patchedUrl = substr($patchedUrl, 0, -strlen($suffix)) . '/' . self::VELOCITA_JSON_FILE;
+        if (\substr($patchedUrl, -\strlen($suffix)) === $suffix) {
+            $patchedUrl = \substr($patchedUrl, 0, -\strlen($suffix)) . '/' . self::VELOCITA_JSON_FILE;
         }
 
         if ($patchedUrl !== $url) {
-            $this->io->write(sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
+            $this->io->write(\sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
         }
 
         return $patchedUrl;
     }
 
-    public function copy($originUrl, $fileUrl, $fileName, $progress = true, $options = [])
+    public function copy($originUrl, $fileUrl, $fileName, $progress = true, $options = []): void
     {
-        $this->io->write(sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true, IOInterface::DEBUG);
+        $this->io->write(\sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true, IOInterface::DEBUG);
 
         $patchedUrl = $this->patchURL($fileUrl);
         parent::copy($originUrl, $patchedUrl, $fileName, $progress, $options);
@@ -84,7 +89,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
 
     public function getContents($originUrl, $fileUrl, $progress = true, $options = [])
     {
-        $this->io->write(sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true,IOInterface::DEBUG);
+        $this->io->write(\sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true, IOInterface::DEBUG);
 
         $patchedUrl = $this->patchURL($fileUrl);
         return parent::getContents($originUrl, $patchedUrl, $progress, $options);

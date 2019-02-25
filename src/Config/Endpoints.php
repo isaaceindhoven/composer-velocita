@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ISAAC\Velocita\Composer\Config;
 
 class Endpoints
@@ -27,12 +29,12 @@ class Endpoints
         return $endpoints;
     }
 
-    public function addRepository(EndpointMapping $mapping)
+    public function addRepository(EndpointMapping $mapping): void
     {
         $this->repositories[] = $mapping;
     }
 
-    public function addDistributionChannel(EndpointMapping $mapping)
+    public function addDistributionChannel(EndpointMapping $mapping): void
     {
         $this->distributionChannels[] = $mapping;
     }

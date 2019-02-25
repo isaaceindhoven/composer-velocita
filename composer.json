@@ -16,7 +16,10 @@
         "composer-plugin-api": "^1.1.0"
     },
     "require-dev": {
-        "composer/composer": "^1.8.4"
+        "composer/composer": "^1.8.4",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.5",
+        "object-calisthenics/phpcs-calisthenics-rules": "^3.4",
+        "slevomat/coding-standard": "^4.8"
     },
     "autoload": {
         "psr-4": {

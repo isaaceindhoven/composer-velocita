@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ISAAC\Velocita\Composer\Plugins;
 
 use Composer\Composer;
@@ -9,6 +11,7 @@ use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PreFileDownloadEvent;
+use Exception;
 use ISAAC\Velocita\Composer\Commands\CommandProvider;
 use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
@@ -40,7 +43,7 @@ class VelocitaPlugin implements VelocitaPluginInterface, EventSubscriberInterfac
         $this->composer = $composer;
         $this->io = $io;
 
-        $this->configPath = sprintf('%s/%s', ComposerFactory::getHomeDir(), self::CONFIG_FILE);
+        $this->configPath = \sprintf('%s/%s', ComposerFactory::getHomeDir(), self::CONFIG_FILE);
     }
 
     public function getCapabilities(): array
@@ -73,9 +76,9 @@ class VelocitaPlugin implements VelocitaPluginInterface, EventSubscriberInterfac
          */
         try {
             $this->handlePreFileDownloadEvent($event);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->io->writeError(
-                sprintf(
+                \sprintf(
                     "<error>Velocita: exception thrown in event handler: %s\n%s</error>",
                     $e->getMessage(),
                     $e->getTraceAsString()
@@ -105,10 +108,10 @@ class VelocitaPlugin implements VelocitaPluginInterface, EventSubscriberInterfac
     protected function loadConfiguration(): PluginConfig
     {
         $data = null;
-        if (is_readable($this->configPath)) {
-            $data = json_decode(file_get_contents($this->configPath), true);
+        if (\is_readable($this->configPath)) {
+            $data = \json_decode(\file_get_contents($this->configPath), true);
         }
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             $data = [];
         }
         return PluginConfig::fromArray($data);
@@ -127,26 +130,26 @@ class VelocitaPlugin implements VelocitaPluginInterface, EventSubscriberInterfac
         $config->validate();
 
         // Ensure parent directory exists
-        $configDir = dirname($this->configPath);
-        if (!is_dir($configDir)) {
-            mkdir($configDir, 0777, true);
+        $configDir = \dirname($this->configPath);
+        if (!\is_dir($configDir)) {
+            \mkdir($configDir, 0777, true);
         }
 
-        file_put_contents($this->configPath, json_encode($config->toArray()));
+        \file_put_contents($this->configPath, \json_encode($config->toArray()));
     }
 
     protected function loadEndpoints(): Endpoints
     {
         $config = $this->getConfiguration();
-        $endpointsURL = sprintf('%s/endpoints', $config->getURL());
-        $endpointsJSON = file_get_contents($endpointsURL);
+        $endpointsURL = \sprintf('%s/endpoints', $config->getURL());
+        $endpointsJSON = \file_get_contents($endpointsURL);
         if ($endpointsJSON === false) {
             throw new IOException('Unable to retrieve endpoints configuration from Velocita');
         }
-        $endpoints = json_decode($endpointsJSON, true);
-        if (!is_array($endpoints)) {
+        $endpoints = \json_decode($endpointsJSON, true);
+        if (!\is_array($endpoints)) {
             throw new IOException(
-                sprintf('Invalid JSON structure retrieved (#%d: %s)', json_last_error(), json_last_error_msg())
+                \sprintf('Invalid JSON structure retrieved (#%d: %s)', \json_last_error(), \json_last_error_msg())
             );
         }
         return Endpoints::fromArray($endpoints);

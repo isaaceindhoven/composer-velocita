@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ISAAC\Velocita\Composer\Exceptions;
 
-class IOException extends \RuntimeException
+use RuntimeException;
+
+class IOException extends RuntimeException
 {
 }

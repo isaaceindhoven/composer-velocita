@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ISAAC\Velocita\Composer\Commands;
 
 use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
