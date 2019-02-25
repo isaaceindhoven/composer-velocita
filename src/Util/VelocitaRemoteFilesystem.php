@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ISAAC\Velocita\Composer\Util;
 
-use Composer\Config;
+use Composer\Config as ComposerConfig;
 use Composer\IO\IOInterface;
 use Composer\Util\RemoteFilesystem;
 use ISAAC\Velocita\Composer\Config\EndpointMapping;
@@ -32,7 +32,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
     public function __construct(
         VelocitaPlugin $plugin,
         IOInterface $io,
-        Config $config = null,
+        ComposerConfig $config = null,
         array $options = []
     ) {
         parent::__construct($io, $config, $options);
