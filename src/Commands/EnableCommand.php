@@ -32,9 +32,10 @@ class EnableCommand extends BaseCommand
             ->addArgument('url', InputArgument::OPTIONAL, 'Sets the URL to your Velocita instance');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        $url = $input->getArgument('url');
+        $inputHelper = new InputInterfaceHelper($input);
+        $url = $inputHelper->getStringArgument('url');
 
         // Update configuration
         $config = $this->plugin->getConfiguration();
@@ -47,5 +48,7 @@ class EnableCommand extends BaseCommand
         $this->plugin->writeConfiguration($config);
 
         $output->writeln('Velocita is now enabled.');
+
+        return null;
     }
 }

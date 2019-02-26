@@ -121,12 +121,12 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
     /**
      * @inheritdoc
      */
-    public function copy($originUrl, $fileUrl, $fileName, $progress = true, $options = []): void
+    public function copy($originUrl, $fileUrl, $fileName, $progress = true, $options = []): bool
     {
         $this->io->write(\sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true, IOInterface::DEBUG);
 
         $patchedUrl = $this->patchURL($fileUrl);
-        parent::copy($originUrl, $patchedUrl, $fileName, $progress, $options);
+        return parent::copy($originUrl, $patchedUrl, $fileName, $progress, $options);
     }
 
     /**

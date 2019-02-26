@@ -115,7 +115,10 @@ class VelocitaPlugin implements EventSubscriberInterface, Capable
     {
         $data = null;
         if (\is_readable($this->configPath)) {
-            $data = \json_decode(\file_get_contents($this->configPath), true);
+            $data = \file_get_contents($this->configPath);
+        }
+        if (\is_string($data)) {
+            $data = \json_decode($data, true);
         }
         if (!\is_array($data)) {
             $data = [];

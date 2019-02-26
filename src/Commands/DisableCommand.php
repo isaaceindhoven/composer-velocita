@@ -30,7 +30,7 @@ class DisableCommand extends BaseCommand
             ->setDescription('Disables the Velocita plugin');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         // Update configuration
         $config = $this->plugin->getConfiguration();
@@ -40,5 +40,7 @@ class DisableCommand extends BaseCommand
         $this->plugin->writeConfiguration($config);
 
         $output->writeln('Velocita is now disabled.');
+
+        return null;
     }
 }
