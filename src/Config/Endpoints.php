@@ -10,23 +10,14 @@ class Endpoints
      * @var EndpointMapping[]
      */
     protected $repositories = [];
-    /**
-     * @var EndpointMapping[]
-     */
-    protected $distributionChannels = [];
 
     public static function fromArray(array $data): Endpoints
     {
         $endpoints = new Endpoints();
 
-        $repos = $data['repositories'] ?? [];
+        $repos = $data['mirrors'] ?? [];
         foreach ($repos as $mappingData) {
             $endpoints->addRepository(EndpointMapping::fromArray($mappingData));
-        }
-
-        $dists = $data['distributionChannels'] ?? [];
-        foreach ($dists as $mappingData) {
-            $endpoints->addDistributionChannel(EndpointMapping::fromArray($mappingData));
         }
 
         return $endpoints;
@@ -37,24 +28,11 @@ class Endpoints
         $this->repositories[] = $mapping;
     }
 
-    public function addDistributionChannel(EndpointMapping $mapping): void
-    {
-        $this->distributionChannels[] = $mapping;
-    }
-
     /**
      * @return EndpointMapping[]
      */
     public function getRepositories(): array
     {
         return $this->repositories;
-    }
-
-    /**
-     * @return EndpointMapping[]
-     */
-    public function getDistributionChannels(): array
-    {
-        return $this->distributionChannels;
     }
 }

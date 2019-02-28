@@ -60,11 +60,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
      */
     private function getMappings(): array
     {
-        $endpoints = $this->plugin->getEndpoints();
-        return \array_merge(
-            $endpoints->getRepositories(),
-            $endpoints->getDistributionChannels()
-        );
+        return $this->plugin->getEndpoints()->getRepositories();
     }
 
     protected function patchURL(string $url): string
@@ -121,22 +117,11 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
     /**
      * @inheritdoc
      */
-    public function copy($originUrl, $fileUrl, $fileName, $progress = true, $options = []): bool
+    protected function get($originUrl, $fileUrl, $additionalOptions = [], $fileName = null, $progress = true)
     {
         $this->io->write(\sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true, IOInterface::DEBUG);
 
         $patchedUrl = $this->patchURL($fileUrl);
-        return parent::copy($originUrl, $patchedUrl, $fileName, $progress, $options);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getContents($originUrl, $fileUrl, $progress = true, $options = [])
-    {
-        $this->io->write(\sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true, IOInterface::DEBUG);
-
-        $patchedUrl = $this->patchURL($fileUrl);
-        return parent::getContents($originUrl, $patchedUrl, $progress, $options);
+        return parent::get($originUrl, $patchedUrl, $additionalOptions, $fileName, $progress);
     }
 }

@@ -18,7 +18,7 @@ class EndpointMapping
     public static function fromArray(array $data): EndpointMapping
     {
         $mapping = new EndpointMapping();
-        $mapping->remoteURL = $data['remoteURL'] ?? null;
+        $mapping->remoteURL = $data['url'] ?? null;
         $mapping->path = $data['path'] ?? null;
         return $mapping;
     }

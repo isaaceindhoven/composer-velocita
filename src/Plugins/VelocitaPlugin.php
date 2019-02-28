@@ -23,6 +23,7 @@ use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     protected const CONFIG_FILE = 'velocita.json';
+    protected const MIRRORS_URL = '%s/mirrors.json';
 
     /**
      * @var Composer
@@ -151,7 +152,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
     protected function loadEndpoints(): Endpoints
     {
         $config = $this->getConfiguration();
-        $endpointsURL = \sprintf('%s/endpoints', $config->getURL());
+        $endpointsURL = \sprintf(static::MIRRORS_URL, $config->getURL());
         $endpointsJSON = \file_get_contents($endpointsURL);
         if ($endpointsJSON === false) {
             throw new IOException('Unable to retrieve endpoints configuration from Velocita');
