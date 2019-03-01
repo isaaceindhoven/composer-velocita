@@ -13,9 +13,6 @@ use ISAAC\Velocita\Composer\Config\PluginConfig;
 
 class VelocitaRemoteFilesystem extends RemoteFilesystem
 {
-    protected const PACKAGES_JSON_FILE = 'packages.json';
-    protected const VELOCITA_JSON_FILE = 'packages-velocita.json';
-
     /**
      * @var PluginConfig
      */
@@ -43,19 +40,6 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
         $this->io = $io;
     }
 
-    private function findMatchingMapping(string $url): ?EndpointMapping
-    {
-        $mappings = $this->getMappings();
-        foreach ($mappings as $mapping) {
-            $prefix = $mapping->getNormalizedRemoteURL();
-            if (\substr($url, 0, \strlen($prefix)) === $prefix) {
-                return $mapping;
-            }
-        }
-
-        return null;
-    }
-
     /**
      * @return EndpointMapping[]
      */
@@ -66,10 +50,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
 
     protected function patchURL(string $url): string
     {
-        $patchedUrl = $url;
-
-        $patchedUrl = $this->patchURLRoot($patchedUrl);
-        $patchedUrl = $this->patchURLFile($patchedUrl);
+        $patchedUrl = $this->patchURLRoot($url);
 
         if ($patchedUrl !== $url) {
             $this->io->write(\sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
@@ -82,34 +63,19 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
     {
         $patchedUrl = $url;
 
-        $matchedMapping = $this->findMatchingMapping($patchedUrl);
-        if ($matchedMapping !== null) {
-            $replacement = \sprintf(
-                '%s/%s',
-                \rtrim($this->config->getURL(), '/'),
-                \ltrim($matchedMapping->getPath(), '/')
-            );
-            $patchedUrl = \sprintf(
-                '%s/%s',
-                \rtrim($replacement, '/'),
-                \substr($url, \strlen($matchedMapping->getNormalizedRemoteURL()))
-            );
-        }
-
-        return $patchedUrl;
-    }
-
-    private function patchURLFile(string $url): string
-    {
-        $patchedUrl = $url;
-
-        $suffix = \sprintf('/%s', self::PACKAGES_JSON_FILE);
-        if (\substr($patchedUrl, -\strlen($suffix)) === $suffix) {
-            $patchedUrl = \sprintf(
-                '%s/%s',
-                \substr($patchedUrl, 0, -\strlen($suffix)),
-                static::VELOCITA_JSON_FILE
-            );
+        foreach ($this->getMappings() as $mapping) {
+            $prefix = $mapping->getNormalizedRemoteURL();
+            $regex = \sprintf('#^https?:%s(?<path>.+)$#i', \preg_quote($prefix));
+            $matches = [];
+            if (\preg_match($regex, $patchedUrl, $matches)) {
+                $patchedUrl = \sprintf(
+                    '%s/%s/%s',
+                    \rtrim($this->config->getURL(), '/'),
+                    \trim($mapping->getPath(), '/'),
+                    \ltrim($matches['path'], '/')
+                );
+                break;
+            }
         }
 
         return $patchedUrl;
