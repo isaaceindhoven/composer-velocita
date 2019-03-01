@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ISAAC\Velocita\Composer\Commands;
 
 use Composer\Command\BaseCommand;
-use ISAAC\Velocita\Composer\Plugins\VelocitaPlugin;
+use ISAAC\Velocita\Composer\VelocitaPlugin;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

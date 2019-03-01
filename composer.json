@@ -28,6 +28,6 @@
         }
     },
     "extra": {
-        "class": "ISAAC\\Velocita\\Composer\\Plugins\\VelocitaPlugin"
+        "class": "ISAAC\\Velocita\\Composer\\VelocitaPlugin"
     }
 }
