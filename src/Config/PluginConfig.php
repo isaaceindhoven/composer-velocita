@@ -50,7 +50,7 @@ class PluginConfig
 
     public function setURL(string $url): void
     {
-        $this->url = $url;
+        $this->url = \rtrim($url, '/');
     }
 
     public function validate(): void
