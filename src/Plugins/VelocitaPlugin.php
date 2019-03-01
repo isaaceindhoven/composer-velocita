@@ -148,7 +148,8 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             \mkdir($configDir, 0777, true);
         }
 
-        \file_put_contents($this->configPath, \json_encode($config->toArray()));
+        $configJSON = \json_encode($config->toArray(), \JSON_PRETTY_PRINT);
+        \file_put_contents($this->configPath, $configJSON);
     }
 
     protected function loadEndpoints(): Endpoints
