@@ -104,8 +104,10 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             return;
         }
 
+        $endpoints = $this->getEndpoints();
         $rfs = new VelocitaRemoteFilesystem(
-            $this,
+            $config,
+            $endpoints,
             $this->io,
             $this->composer->getConfig(),
             $event->getRemoteFilesystem()->getOptions()

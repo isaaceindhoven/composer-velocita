@@ -8,8 +8,8 @@ use Composer\Config as ComposerConfig;
 use Composer\IO\IOInterface;
 use Composer\Util\RemoteFilesystem;
 use ISAAC\Velocita\Composer\Config\EndpointMapping;
+use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
-use ISAAC\Velocita\Composer\Plugins\VelocitaPlugin;
 
 class VelocitaRemoteFilesystem extends RemoteFilesystem
 {
@@ -21,25 +21,26 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
      */
     protected $config;
     /**
-     * @var VelocitaPlugin
+     * @var Endpoints
      */
-    protected $plugin;
+    protected $endpoints;
     /**
      * @var IOInterface
      */
     protected $io;
 
     public function __construct(
-        VelocitaPlugin $plugin,
+        PluginConfig $pluginConfig,
+        Endpoints $endpoints,
         IOInterface $io,
         ComposerConfig $config = null,
         array $options = []
     ) {
         parent::__construct($io, $config, $options);
 
-        $this->plugin = $plugin;
+        $this->config = $pluginConfig;
+        $this->endpoints = $endpoints;
         $this->io = $io;
-        $this->config = $this->plugin->getConfiguration();
     }
 
     private function findMatchingMapping(string $url): ?EndpointMapping
@@ -60,7 +61,7 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
      */
     private function getMappings(): array
     {
-        return $this->plugin->getEndpoints()->getRepositories();
+        return $this->endpoints->getRepositories();
     }
 
     protected function patchURL(string $url): string
