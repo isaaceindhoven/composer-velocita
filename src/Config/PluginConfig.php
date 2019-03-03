@@ -11,19 +11,11 @@ class PluginConfig
     /**
      * @var bool
      */
-    protected $enabled;
+    protected $enabled = false;
     /**
-     * @var string
+     * @var ?string
      */
     protected $url;
-
-    public function toArray(): array
-    {
-        return [
-            'enabled' => $this->enabled,
-            'url'     => $this->url,
-        ];
-    }
 
     public function isEnabled(): bool
     {
@@ -35,14 +27,18 @@ class PluginConfig
         $this->enabled = $enabled;
     }
 
-    public function getURL(): string
+    public function getURL(): ?string
     {
         return $this->url;
     }
 
-    public function setURL(string $url): void
+    public function setURL(?string $url): void
     {
-        $this->url = \rtrim($url, '/');
+        if ($url === null) {
+            $this->url = null;
+        } else {
+            $this->url = \rtrim($url, '/');
+        }
     }
 
     public function validate(): void

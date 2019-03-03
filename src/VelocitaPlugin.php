@@ -28,6 +28,7 @@ use ISAAC\Velocita\Composer\Config\PluginConfigWriter;
 use ISAAC\Velocita\Composer\Exceptions\IOException;
 use ISAAC\Velocita\Composer\Util\ComposerFactory;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
+use LogicException;
 
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
 {
@@ -74,8 +75,12 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             return;
         }
 
-        $endpoints = $this->loadEndpoints();
-        $this->urlMapper = new UrlMapper($this->config->getURL(), $endpoints->getRepositories());
+        $url = $this->config->getURL();
+        if ($url === null) {
+            throw new LogicException('Velocita enabled but no URL set');
+        }
+        $mappings = $this->loadEndpoints()->getRepositories();
+        $this->urlMapper = new UrlMapper($url, $mappings);
     }
 
     public function getCapabilities(): array

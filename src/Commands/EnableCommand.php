@@ -40,9 +40,7 @@ class EnableCommand extends BaseCommand
         // Update configuration
         $config = $this->plugin->getConfiguration();
         $config->setEnabled(true);
-        if ($url !== null) {
-            $config->setURL($url);
-        }
+        $config->setURL($url);
 
         // Write new configuration
         $this->plugin->writeConfiguration($config);
