@@ -7,7 +7,7 @@ namespace ISAAC\Velocita\Composer\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use UnexpectedValueException;
 
-class InputInterfaceHelper
+class InputInterfaceAdapter
 {
     /**
      * @var InputInterface

@@ -34,8 +34,8 @@ class EnableCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
-        $inputHelper = new InputInterfaceHelper($input);
-        $url = $inputHelper->getStringArgument('url');
+        $inputAdapter = new InputInterfaceAdapter($input);
+        $url = $inputAdapter->getStringArgument('url');
 
         // Update configuration
         $config = $this->plugin->getConfiguration();
