@@ -48,8 +48,6 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
      */
     protected function get($originUrl, $fileUrl, $additionalOptions = [], $fileName = null, $progress = true)
     {
-        $this->io->write(\sprintf('%s(fileUrl=%s)', __METHOD__, $fileUrl), true, IOInterface::DEBUG);
-
         $patchedUrl = $this->patchURL($fileUrl);
         return parent::get($originUrl, $patchedUrl, $additionalOptions, $fileName, $progress);
     }

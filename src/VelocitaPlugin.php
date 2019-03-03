@@ -19,6 +19,7 @@ use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PreFileDownloadEvent;
 use Exception;
 use ISAAC\Velocita\Composer\Commands\CommandProvider;
+use ISAAC\Velocita\Composer\Compatibility\CompatibilityDetector;
 use ISAAC\Velocita\Composer\Composer\OperationAdapter;
 use ISAAC\Velocita\Composer\Composer\PackageAdapter;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
@@ -60,6 +61,10 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
      * @var UrlMapper
      */
     protected $urlMapper;
+    /**
+     * @var CompatibilityDetector
+     */
+    protected $compatibilityDetector;
 
     public function activate(Composer $composer, IOInterface $io): void
     {
@@ -81,6 +86,8 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         }
         $mappings = $this->getRemoteConfig()->getMirrors();
         $this->urlMapper = new UrlMapper($url, $mappings);
+
+        $this->compatibilityDetector = new CompatibilityDetector($composer, $io);
     }
 
     public function getCapabilities(): array
@@ -96,9 +103,15 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             return [];
         }
         return [
+            InstallerEvents::PRE_DEPENDENCIES_SOLVING  => ['onPreDependenciesSolving', \PHP_INT_MAX],
             InstallerEvents::POST_DEPENDENCIES_SOLVING => ['onPostDependenciesSolving', \PHP_INT_MAX],
             PluginEvents::PRE_FILE_DOWNLOAD            => ['onPreFileDownload', 0],
         ];
+    }
+
+    public function onPreDependenciesSolving(InstallerEvent $event): void
+    {
+        $this->compatibilityDetector->fixCompatibility();
     }
 
     public function onPostDependenciesSolving(InstallerEvent $event): void
