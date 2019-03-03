@@ -25,6 +25,10 @@ class PluginConfigReader
      */
     public function read(string $path): PluginConfig
     {
+        if (!\is_readable($path)) {
+            throw new IOException('Unable to read configuration');
+        }
+
         $data = \file_get_contents($path);
         if ($data === false) {
             throw new IOException('Failed to read configuration');
