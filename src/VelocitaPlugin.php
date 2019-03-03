@@ -27,7 +27,7 @@ use ISAAC\Velocita\Composer\Config\PluginConfigReader;
 use ISAAC\Velocita\Composer\Config\PluginConfigWriter;
 use ISAAC\Velocita\Composer\Config\RemoteConfig;
 use ISAAC\Velocita\Composer\Exceptions\IOException;
-use ISAAC\Velocita\Composer\Util\ComposerFactory;
+use ISAAC\Velocita\Composer\Composer\ComposerFactory;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
 use LogicException;
 
