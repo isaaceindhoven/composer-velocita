@@ -23,6 +23,8 @@ use ISAAC\Velocita\Composer\Composer\OperationAdapter;
 use ISAAC\Velocita\Composer\Composer\PackageAdapter;
 use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
+use ISAAC\Velocita\Composer\Config\PluginConfigReader;
+use ISAAC\Velocita\Composer\Config\PluginConfigWriter;
 use ISAAC\Velocita\Composer\Exceptions\IOException;
 use ISAAC\Velocita\Composer\Util\ComposerFactory;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
@@ -64,7 +66,8 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $this->io = $io;
 
         $this->configPath = \sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), self::CONFIG_FILE);
-        $this->config = $this->loadConfiguration();
+        $configReader = new PluginConfigReader();
+        $this->config = $configReader->readOrNew($this->configPath);
 
         static::$enabled = $this->config->isEnabled();
         if (!static::$enabled) {
@@ -171,21 +174,6 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $event->setRemoteFilesystem($rfs);
     }
 
-    protected function loadConfiguration(): PluginConfig
-    {
-        $data = null;
-        if (\is_readable($this->configPath)) {
-            $data = \file_get_contents($this->configPath);
-        }
-        if (\is_string($data)) {
-            $data = \json_decode($data, true);
-        }
-        if (!\is_array($data)) {
-            $data = [];
-        }
-        return PluginConfig::fromArray($data);
-    }
-
     public function getConfiguration(): PluginConfig
     {
         return $this->config;
@@ -193,22 +181,13 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     public function writeConfiguration(PluginConfig $config): void
     {
-        $config->validate();
-
-        // Ensure parent directory exists
-        $configDir = \dirname($this->configPath);
-        if (!\is_dir($configDir)) {
-            \mkdir($configDir, 0777, true);
-        }
-
-        $configJSON = \json_encode($config->toArray(), \JSON_PRETTY_PRINT);
-        \file_put_contents($this->configPath, $configJSON);
+        $writer = new PluginConfigWriter($config);
+        $writer->write($this->configPath);
     }
 
     protected function loadEndpoints(): Endpoints
     {
-        $config = $this->getConfiguration();
-        $endpointsURL = \sprintf(static::MIRRORS_URL, $config->getURL());
+        $endpointsURL = \sprintf(static::MIRRORS_URL, $this->config->getURL());
         $endpointsJSON = \file_get_contents($endpointsURL);
         if ($endpointsJSON === false) {
             throw new IOException('Unable to retrieve endpoints configuration from Velocita');
