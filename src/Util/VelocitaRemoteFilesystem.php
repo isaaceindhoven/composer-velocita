@@ -7,75 +7,37 @@ namespace ISAAC\Velocita\Composer\Util;
 use Composer\Config as ComposerConfig;
 use Composer\IO\IOInterface;
 use Composer\Util\RemoteFilesystem;
-use ISAAC\Velocita\Composer\Config\EndpointMapping;
-use ISAAC\Velocita\Composer\Config\Endpoints;
-use ISAAC\Velocita\Composer\Config\PluginConfig;
+use ISAAC\Velocita\Composer\UrlMapper;
 
 class VelocitaRemoteFilesystem extends RemoteFilesystem
 {
     /**
-     * @var PluginConfig
+     * @var UrlMapper
      */
-    protected $config;
-    /**
-     * @var Endpoints
-     */
-    protected $endpoints;
+    protected $urlMapper;
     /**
      * @var IOInterface
      */
     protected $io;
 
     public function __construct(
-        PluginConfig $pluginConfig,
-        Endpoints $endpoints,
+        UrlMapper $urlMapper,
         IOInterface $io,
         ComposerConfig $config = null,
         array $options = []
     ) {
         parent::__construct($io, $config, $options);
 
-        $this->config = $pluginConfig;
-        $this->endpoints = $endpoints;
+        $this->urlMapper = $urlMapper;
         $this->io = $io;
-    }
-
-    /**
-     * @return EndpointMapping[]
-     */
-    private function getMappings(): array
-    {
-        return $this->endpoints->getRepositories();
     }
 
     protected function patchURL(string $url): string
     {
-        $patchedUrl = $this->patchURLRoot($url);
+        $patchedUrl = $this->urlMapper->applyMappings($url);
 
         if ($patchedUrl !== $url) {
             $this->io->write(\sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
-        }
-
-        return $patchedUrl;
-    }
-
-    private function patchURLRoot(string $url): string
-    {
-        $patchedUrl = $url;
-
-        foreach ($this->getMappings() as $mapping) {
-            $prefix = $mapping->getNormalizedRemoteURL();
-            $regex = \sprintf('#^https?:%s(?<path>.+)$#i', \preg_quote($prefix));
-            $matches = [];
-            if (\preg_match($regex, $patchedUrl, $matches)) {
-                $patchedUrl = \sprintf(
-                    '%s/%s/%s',
-                    \rtrim($this->config->getURL(), '/'),
-                    \trim($mapping->getPath(), '/'),
-                    \ltrim($matches['path'], '/')
-                );
-                break;
-            }
         }
 
         return $patchedUrl;

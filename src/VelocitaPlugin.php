@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace ISAAC\Velocita\Composer;
 
 use Composer\Composer;
+use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Installer\InstallerEvent;
+use Composer\Installer\InstallerEvents;
 use Composer\IO\IOInterface;
+use Composer\Package\Package;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginEvents;
@@ -14,6 +19,8 @@ use Composer\Plugin\PluginInterface;
 use Composer\Plugin\PreFileDownloadEvent;
 use Exception;
 use ISAAC\Velocita\Composer\Commands\CommandProvider;
+use ISAAC\Velocita\Composer\Composer\OperationAdapter;
+use ISAAC\Velocita\Composer\Composer\PackageAdapter;
 use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
 use ISAAC\Velocita\Composer\Exceptions\IOException;
@@ -24,6 +31,11 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 {
     protected const CONFIG_FILE = 'velocita.json';
     protected const MIRRORS_URL = '%s/mirrors.json';
+
+    /**
+     * @var bool
+     */
+    protected static $enabled = true;
 
     /**
      * @var Composer
@@ -40,11 +52,11 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
     /**
      * @var PluginConfig
      */
-    protected $config = null;
+    protected $config;
     /**
-     * @var Endpoints
+     * @var UrlMapper
      */
-    protected $endpoints = null;
+    protected $urlMapper;
 
     public function activate(Composer $composer, IOInterface $io): void
     {
@@ -52,6 +64,15 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $this->io = $io;
 
         $this->configPath = \sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), self::CONFIG_FILE);
+        $this->config = $this->loadConfiguration();
+
+        static::$enabled = $this->config->isEnabled();
+        if (!static::$enabled) {
+            return;
+        }
+
+        $endpoints = $this->loadEndpoints();
+        $this->urlMapper = new UrlMapper($this->config->getURL(), $endpoints->getRepositories());
     }
 
     public function getCapabilities(): array
@@ -63,17 +84,60 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     public static function getSubscribedEvents(): array
     {
-        $method = 'onPreFileDownload';
-        $priority = 0;
-
-        // Subscribe to PRE_FILE_DOWNLOAD
+        if (!static::$enabled) {
+            return [];
+        }
         return [
-            PluginEvents::PRE_FILE_DOWNLOAD => [
-                [$method, $priority],
-            ],
+            InstallerEvents::POST_DEPENDENCIES_SOLVING => ['onPostDependenciesSolving', \PHP_INT_MAX],
+            PluginEvents::PRE_FILE_DOWNLOAD            => ['onPreFileDownload', 0],
         ];
     }
 
+    public function onPostDependenciesSolving(InstallerEvent $event): void
+    {
+        foreach ($event->getOperations() as $operation) {
+            if (!$operation instanceof InstallOperation && !$operation instanceof UpdateOperation) {
+                continue;
+            }
+
+            $operationAdapter = new OperationAdapter($operation);
+            $package = $operationAdapter->getPackage();
+
+            $this->patchPackage($package);
+        }
+    }
+
+    private function patchPackage(Package $package): void
+    {
+        $packageAdapter = new PackageAdapter($package);
+        $primaryUrl = $packageAdapter->getPrimaryUrl();
+        if ($primaryUrl === null) {
+            return;
+        }
+
+        $patchedUrl = $this->urlMapper->applyMappings($primaryUrl);
+        if ($patchedUrl === $primaryUrl) {
+            return;
+        }
+
+        $this->io->write(
+            \sprintf('%s(url=%s): %s', __METHOD__, $primaryUrl, $patchedUrl),
+            true,
+            IOInterface::DEBUG
+        );
+
+        /** @var $package Package */
+        $package->setDistMirrors([
+            [
+                'url'       => $patchedUrl,
+                'preferred' => true,
+            ]
+        ]);
+    }
+
+    /**
+     * @throws Exception
+     */
     public function onPreFileDownload(PreFileDownloadEvent $event): void
     {
         /*
@@ -98,16 +162,8 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     protected function handlePreFileDownloadEvent(PreFileDownloadEvent $event): void
     {
-        // Don't do anything if we're disabled
-        $config = $this->getConfiguration();
-        if (!$config->isEnabled()) {
-            return;
-        }
-
-        $endpoints = $this->getEndpoints();
         $rfs = new VelocitaRemoteFilesystem(
-            $config,
-            $endpoints,
+            $this->urlMapper,
             $this->io,
             $this->composer->getConfig(),
             $event->getRemoteFilesystem()->getOptions()
@@ -132,9 +188,6 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     public function getConfiguration(): PluginConfig
     {
-        if ($this->config === null) {
-            $this->config = $this->loadConfiguration();
-        }
         return $this->config;
     }
 
@@ -167,13 +220,5 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             );
         }
         return Endpoints::fromArray($endpoints);
-    }
-
-    public function getEndpoints(): Endpoints
-    {
-        if ($this->endpoints === null) {
-            $this->endpoints = $this->loadEndpoints();
-        }
-        return $this->endpoints;
     }
 }
