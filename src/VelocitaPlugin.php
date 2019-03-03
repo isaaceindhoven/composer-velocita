@@ -79,7 +79,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         if ($url === null) {
             throw new LogicException('Velocita enabled but no URL set');
         }
-        $mappings = $this->loadEndpoints()->getRepositories();
+        $mappings = $this->loadEndpoints()->getMirrors();
         $this->urlMapper = new UrlMapper($url, $mappings);
     }
 

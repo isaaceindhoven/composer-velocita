@@ -7,32 +7,32 @@ namespace ISAAC\Velocita\Composer\Config;
 class Endpoints
 {
     /**
-     * @var EndpointMapping[]
+     * @var MirrorMapping[]
      */
-    protected $repositories = [];
+    protected $mirrors = [];
 
     public static function fromArray(array $data): Endpoints
     {
         $endpoints = new Endpoints();
 
-        $repos = $data['mirrors'] ?? [];
-        foreach ($repos as $mappingData) {
-            $endpoints->addRepository(EndpointMapping::fromArray($mappingData));
+        $mirrors = $data['mirrors'] ?? [];
+        foreach ($mirrors as $mappingData) {
+            $endpoints->addMirror(MirrorMapping::fromArray($mappingData));
         }
 
         return $endpoints;
     }
 
-    public function addRepository(EndpointMapping $mapping): void
+    public function addMirror(MirrorMapping $mapping): void
     {
-        $this->repositories[] = $mapping;
+        $this->mirrors[] = $mapping;
     }
 
     /**
-     * @return EndpointMapping[]
+     * @return MirrorMapping[]
      */
-    public function getRepositories(): array
+    public function getMirrors(): array
     {
-        return $this->repositories;
+        return $this->mirrors;
     }
 }

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ISAAC\Velocita\Composer;
 
-use ISAAC\Velocita\Composer\Config\EndpointMapping;
+use ISAAC\Velocita\Composer\Config\MirrorMapping;
 
 class UrlMapper
 {
     /**
-     * @var EndpointMapping[]
+     * @var MirrorMapping[]
      */
     private $mappings;
     /**
@@ -18,7 +18,7 @@ class UrlMapper
     private $rootUrl;
 
     /**
-     * @param EndpointMapping[] $mappings
+     * @param MirrorMapping[] $mappings
      */
     public function __construct(string $rootUrl, array $mappings)
     {
@@ -31,7 +31,7 @@ class UrlMapper
         $patchedUrl = $url;
 
         foreach ($this->mappings as $mapping) {
-            $prefix = $mapping->getNormalizedRemoteURL();
+            $prefix = $mapping->getNormalizedUrl();
             $regex = \sprintf('#^https?:%s(?<path>.+)$#i', \preg_quote($prefix));
             $matches = [];
             if (\preg_match($regex, $patchedUrl, $matches)) {
