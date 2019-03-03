@@ -21,10 +21,10 @@ use Exception;
 use ISAAC\Velocita\Composer\Commands\CommandProvider;
 use ISAAC\Velocita\Composer\Composer\OperationAdapter;
 use ISAAC\Velocita\Composer\Composer\PackageAdapter;
-use ISAAC\Velocita\Composer\Config\Endpoints;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
 use ISAAC\Velocita\Composer\Config\PluginConfigReader;
 use ISAAC\Velocita\Composer\Config\PluginConfigWriter;
+use ISAAC\Velocita\Composer\Config\RemoteConfig;
 use ISAAC\Velocita\Composer\Exceptions\IOException;
 use ISAAC\Velocita\Composer\Util\ComposerFactory;
 use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
@@ -33,7 +33,7 @@ use LogicException;
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     protected const CONFIG_FILE = 'velocita.json';
-    protected const MIRRORS_URL = '%s/mirrors.json';
+    protected const REMOTE_CONFIG_URL = '%s/mirrors.json';
 
     /**
      * @var bool
@@ -79,7 +79,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         if ($url === null) {
             throw new LogicException('Velocita enabled but no URL set');
         }
-        $mappings = $this->loadEndpoints()->getMirrors();
+        $mappings = $this->getRemoteConfig()->getMirrors();
         $this->urlMapper = new UrlMapper($url, $mappings);
     }
 
@@ -190,19 +190,19 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $writer->write($this->configPath);
     }
 
-    protected function loadEndpoints(): Endpoints
+    protected function getRemoteConfig(): RemoteConfig
     {
-        $endpointsURL = \sprintf(static::MIRRORS_URL, $this->config->getURL());
-        $endpointsJSON = \file_get_contents($endpointsURL);
-        if ($endpointsJSON === false) {
-            throw new IOException('Unable to retrieve endpoints configuration from Velocita');
+        $remoteConfigUrl = \sprintf(static::REMOTE_CONFIG_URL, $this->config->getURL());
+        $remoteConfigJSON = \file_get_contents($remoteConfigUrl);
+        if ($remoteConfigJSON === false) {
+            throw new IOException('Unable to retrieve remote Velocita configuration');
         }
-        $endpoints = \json_decode($endpointsJSON, true);
-        if (!\is_array($endpoints)) {
+        $remoteConfigData = \json_decode($remoteConfigJSON, true);
+        if (!\is_array($remoteConfigData)) {
             throw new IOException(
-                \sprintf('Invalid JSON structure retrieved (#%d: %s)', \json_last_error(), \json_last_error_msg())
+                \sprintf('Invalid JSON structure (#%d: %s)', \json_last_error(), \json_last_error_msg())
             );
         }
-        return Endpoints::fromArray($endpoints);
+        return RemoteConfig::fromArray($remoteConfigData);
     }
 }

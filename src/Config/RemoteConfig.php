@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace ISAAC\Velocita\Composer\Config;
 
-class Endpoints
+class RemoteConfig
 {
     /**
      * @var MirrorMapping[]
      */
     protected $mirrors = [];
 
-    public static function fromArray(array $data): Endpoints
+    public static function fromArray(array $data): RemoteConfig
     {
-        $endpoints = new Endpoints();
+        $config = new RemoteConfig();
 
         $mirrors = $data['mirrors'] ?? [];
         foreach ($mirrors as $mappingData) {
-            $endpoints->addMirror(MirrorMapping::fromArray($mappingData));
+            $config->addMirror(MirrorMapping::fromArray($mappingData));
         }
 
-        return $endpoints;
+        return $config;
     }
 
     public function addMirror(MirrorMapping $mapping): void
