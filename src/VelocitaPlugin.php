@@ -23,7 +23,6 @@ use ISAAC\Velocita\Composer\Config\PluginConfig;
 use ISAAC\Velocita\Composer\Config\PluginConfigReader;
 use ISAAC\Velocita\Composer\Config\PluginConfigWriter;
 use ISAAC\Velocita\Composer\Config\RemoteConfig;
-use ISAAC\Velocita\Composer\Exceptions\IOException;
 use LogicException;
 
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
@@ -67,8 +66,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $this->io = $io;
 
         $this->configPath = \sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), self::CONFIG_FILE);
-        $configReader = new PluginConfigReader();
-        $this->config = $configReader->readOrNew($this->configPath);
+        $this->config = (new PluginConfigReader())->readOrNew($this->configPath);
 
         static::$enabled = $this->config->isEnabled();
         if (!static::$enabled) {
@@ -79,9 +77,14 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         if ($url === null) {
             throw new LogicException('Velocita enabled but no URL set');
         }
-        $mappings = $this->getRemoteConfig()->getMirrors();
-        $this->urlMapper = new UrlMapper($url, $mappings);
+        try {
+            $remoteConfig = $this->getRemoteConfig($url);
+        } catch (Exception $e) {
+            $this->io->writeError(\sprintf('Failed to retrieve remote config: %s', $e->getMessage()));
+            return;
+        }
 
+        $this->urlMapper = new UrlMapper($url, $remoteConfig->getMirrors());
         $this->compatibilityDetector = new CompatibilityDetector($composer, $io, $this->urlMapper);
     }
 
@@ -163,19 +166,11 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $writer->write($this->configPath);
     }
 
-    protected function getRemoteConfig(): RemoteConfig
+    protected function getRemoteConfig(string $url): RemoteConfig
     {
-        $remoteConfigUrl = \sprintf(static::REMOTE_CONFIG_URL, $this->config->getURL());
+        $remoteConfigUrl = \sprintf(static::REMOTE_CONFIG_URL, $url);
         $remoteConfigJSON = \file_get_contents($remoteConfigUrl);
-        if ($remoteConfigJSON === false) {
-            throw new IOException('Unable to retrieve remote Velocita configuration');
-        }
-        $remoteConfigData = \json_decode($remoteConfigJSON, true);
-        if (!\is_array($remoteConfigData)) {
-            throw new IOException(
-                \sprintf('Invalid JSON structure (#%d: %s)', \json_last_error(), \json_last_error_msg())
-            );
-        }
+        $remoteConfigData = \json_decode((string)$remoteConfigJSON, true);
         return RemoteConfig::fromArray($remoteConfigData);
     }
 }
