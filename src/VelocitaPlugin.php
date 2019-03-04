@@ -6,7 +6,6 @@ namespace ISAAC\Velocita\Composer;
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
-use Composer\Installer\InstallerEvent;
 use Composer\Installer\InstallerEvents;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
@@ -105,14 +104,14 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         ];
     }
 
+    public function onPreDependenciesSolving(): void
+    {
+        $this->compatibilityDetector->fixCompatibility();
+    }
+
     public function onPostPackageInstall(PackageEvent $event): void
     {
         $this->compatibilityDetector->onPackageInstall($event);
-    }
-
-    public function onPreDependenciesSolving(InstallerEvent $event): void
-    {
-        $this->compatibilityDetector->fixCompatibility();
     }
 
     /**
