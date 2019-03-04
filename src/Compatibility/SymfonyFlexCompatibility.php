@@ -8,8 +8,6 @@ use Closure;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use ISAAC\Velocita\Composer\UrlMapper;
-use Symfony\Flex\Downloader;
-use Symfony\Flex\Flex;
 
 /**
  * Symfony Flex and Velocita work great together, but the parallel dist file prefetcher in Flex is implemented as a new
@@ -57,9 +55,9 @@ class SymfonyFlexCompatibility implements CompatibilityFix
 
             $fixDownloader = Closure::bind(function () use ($velocitaRfs): void {
                 $this->rfs = $velocitaRfs;
-            }, $this->downloader, Downloader::class);
+            }, $this->downloader, \get_class($this->downloader));
             $fixDownloader();
-        }, $plugin, Flex::class);
+        }, $plugin, \get_class($plugin));
         $wrapRfs();
 
         $this->io->write(\sprintf('%s(): successfully wrapped Flex RFS', __METHOD__), true, IOInterface::DEBUG);
