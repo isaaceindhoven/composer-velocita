@@ -47,7 +47,7 @@ class EnableCommand extends BaseCommand
         // Write new configuration
         $this->plugin->writeConfiguration($config);
 
-        $output->writeln('Velocita is now enabled.');
+        $output->writeln('Velocita is now <info>enabled</info>.');
 
         return null;
     }

@@ -39,7 +39,7 @@ class DisableCommand extends BaseCommand
         // Write new configuration
         $this->plugin->writeConfiguration($config);
 
-        $output->writeln('Velocita is now disabled.');
+        $output->writeln('Velocita is now <warning>disabled</warning>.');
 
         return null;
     }
