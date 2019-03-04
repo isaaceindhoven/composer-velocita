@@ -41,6 +41,8 @@ composer velocita:disable
 
 * The `composer create-project` command initially downloads from Packagist directly, but will use Velocita for the
   subsequent installation of dependencies. See [Composer issue #7090](https://github.com/composer/composer/issues/7090).
+* The Symfony Flex and Prestissimo plugins might try to download directly from Packagist; although this should never
+  happen for `composer install` with an existing `composer.lock` file.
 
 ## Authors
 
