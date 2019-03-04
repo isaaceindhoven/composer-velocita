@@ -1,5 +1,9 @@
 # Velocita Composer plugin
 
+[![Latest Stable Version](https://poser.pugx.org/isaac/composer-velocita/version)](https://packagist.org/packages/isaac/composer-velocita)
+[![Total Downloads](https://poser.pugx.org/isaac/composer-velocita/downloads)](https://packagist.org/packages/isaac/composer-velocita)
+[![License](https://poser.pugx.org/isaac/composer-velocita/license)](https://packagist.org/packages/isaac/composer-velocita)
+
 A Composer plugin that enables transparent Velocita caching for your projects.
 
 ## Getting Started
