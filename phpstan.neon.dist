@@ -3,5 +3,6 @@ parameters:
   paths:
     - %rootDir%/../../../src/
   excludes_analyse:
-    # Ignore Symfony Flex compatibility - installing symfony/flex results in the Composer plugin being loaded
+    # Ignore compatibility fixes since including their dependencies would load the Composer plugins
+    - %rootDir%/../../../src/Compatibility/PrestissimoCompatibility.php
     - %rootDir%/../../../src/Compatibility/SymfonyFlex*.php

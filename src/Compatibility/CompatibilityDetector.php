@@ -14,9 +14,11 @@ use ISAAC\Velocita\Composer\UrlMapper;
 class CompatibilityDetector
 {
     private const PACKAGE_INSTALL_TRIGGERS = [
+        'hirak/prestissimo' => PrestissimoCompatibility::class,
         'symfony/flex' => SymfonyFlexCompatibility::class,
     ];
     private const PLUGIN_CLASS_COMPATIBILITY = [
+        'Hirak\\Prestissimo\\Plugin' => PrestissimoCompatibility::class,
         'Symfony\\Flex\\Flex' => SymfonyFlexCompatibility::class,
     ];
 
