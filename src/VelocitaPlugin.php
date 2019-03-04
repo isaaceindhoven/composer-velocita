@@ -65,7 +65,12 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $this->composer = $composer;
         $this->io = $io;
 
-        $this->configPath = \sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), self::CONFIG_FILE);
+        $this->initialize();
+    }
+
+    private function initialize(): void
+    {
+        $this->configPath = \sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), static::CONFIG_FILE);
         $this->config = (new PluginConfigReader())->readOrNew($this->configPath);
 
         static::$enabled = $this->config->isEnabled();
@@ -81,11 +86,12 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             $remoteConfig = $this->getRemoteConfig($url);
         } catch (Exception $e) {
             $this->io->writeError(\sprintf('Failed to retrieve remote config: %s', $e->getMessage()));
+            static::$enabled = false;
             return;
         }
 
         $this->urlMapper = new UrlMapper($url, $remoteConfig->getMirrors());
-        $this->compatibilityDetector = new CompatibilityDetector($composer, $io, $this->urlMapper);
+        $this->compatibilityDetector = new CompatibilityDetector($this->composer, $this->io, $this->urlMapper);
     }
 
     public function getCapabilities(): array
