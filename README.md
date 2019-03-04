@@ -14,10 +14,10 @@ A Composer plugin that enables transparent Velocita caching for your projects.
 * Composer
 * A running [Velocita](https://github.com/isaaceindhoven/velocita) instance
 
-### Installing
+### Installation
 
 Installation and configuration of the Velocita plugin is global, so you can use it for all projects that use Composer
-without having to add it as a requirement to your `composer.json`.
+without having to add it to your project's `composer.json`.
 
 ```
 composer global require isaac/composer-velocita
@@ -26,15 +26,21 @@ composer velocita:enable https://url.to.your.velocita.tld/
 
 ### Usage
 
-After enabling and configuring the Velocita plugin, it is automatically used for all Composer projects when running
-`require`, `update`, `install`, etcetera.
+After enabling and configuring Velocita, it is automatically used for all Composer projects when running `require`,
+`update`, `install`, etcetera.
 
-### Disabling
+### Removal
 
 Disable the plugin by executing:
 
 ```
 composer velocita:disable
+```
+
+If you want to remove the plugin completely, execute:
+
+```
+composer global remove isaac/composer-velocita
 ```
 
 ## Known issues
