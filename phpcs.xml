@@ -53,7 +53,7 @@
     </rule>
     <rule ref="ObjectCalisthenics.Metrics.MethodPerClassLimit">
         <properties>
-            <property name="maxCount" value="15"/>
+            <property name="maxCount" value="12"/>
         </properties>
     </rule>
     <rule ref="ObjectCalisthenics.Metrics.PropertyPerClassLimit">

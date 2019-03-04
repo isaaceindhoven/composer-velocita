@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace ISAAC\Velocita\Composer;
 
 use Composer\Composer;
-use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\InstallerEvent;
 use Composer\Installer\InstallerEvents;
+use Composer\Installer\PackageEvent;
+use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
-use Composer\Package\Package;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginEvents;
@@ -20,15 +19,12 @@ use Composer\Plugin\PreFileDownloadEvent;
 use Exception;
 use ISAAC\Velocita\Composer\Commands\CommandProvider;
 use ISAAC\Velocita\Composer\Compatibility\CompatibilityDetector;
-use ISAAC\Velocita\Composer\Composer\OperationAdapter;
-use ISAAC\Velocita\Composer\Composer\PackageAdapter;
+use ISAAC\Velocita\Composer\Composer\ComposerFactory;
 use ISAAC\Velocita\Composer\Config\PluginConfig;
 use ISAAC\Velocita\Composer\Config\PluginConfigReader;
 use ISAAC\Velocita\Composer\Config\PluginConfigWriter;
 use ISAAC\Velocita\Composer\Config\RemoteConfig;
 use ISAAC\Velocita\Composer\Exceptions\IOException;
-use ISAAC\Velocita\Composer\Composer\ComposerFactory;
-use ISAAC\Velocita\Composer\Util\VelocitaRemoteFilesystem;
 use LogicException;
 
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
@@ -87,7 +83,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $mappings = $this->getRemoteConfig()->getMirrors();
         $this->urlMapper = new UrlMapper($url, $mappings);
 
-        $this->compatibilityDetector = new CompatibilityDetector($composer, $io);
+        $this->compatibilityDetector = new CompatibilityDetector($composer, $io, $this->urlMapper);
     }
 
     public function getCapabilities(): array
@@ -103,57 +99,20 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             return [];
         }
         return [
-            InstallerEvents::PRE_DEPENDENCIES_SOLVING  => ['onPreDependenciesSolving', \PHP_INT_MAX],
-            InstallerEvents::POST_DEPENDENCIES_SOLVING => ['onPostDependenciesSolving', \PHP_INT_MAX],
-            PluginEvents::PRE_FILE_DOWNLOAD            => ['onPreFileDownload', 0],
+            InstallerEvents::PRE_DEPENDENCIES_SOLVING => ['onPreDependenciesSolving', \PHP_INT_MAX],
+            PackageEvents::POST_PACKAGE_INSTALL       => ['onPostPackageInstall', 0],
+            PluginEvents::PRE_FILE_DOWNLOAD           => ['onPreFileDownload', 0],
         ];
+    }
+
+    public function onPostPackageInstall(PackageEvent $event): void
+    {
+        $this->compatibilityDetector->onPackageInstall($event);
     }
 
     public function onPreDependenciesSolving(InstallerEvent $event): void
     {
         $this->compatibilityDetector->fixCompatibility();
-    }
-
-    public function onPostDependenciesSolving(InstallerEvent $event): void
-    {
-        foreach ($event->getOperations() as $operation) {
-            if (!$operation instanceof InstallOperation && !$operation instanceof UpdateOperation) {
-                continue;
-            }
-
-            $operationAdapter = new OperationAdapter($operation);
-            $package = $operationAdapter->getPackage();
-
-            $this->patchPackage($package);
-        }
-    }
-
-    private function patchPackage(Package $package): void
-    {
-        $packageAdapter = new PackageAdapter($package);
-        $primaryUrl = $packageAdapter->getPrimaryUrl();
-        if ($primaryUrl === null) {
-            return;
-        }
-
-        $patchedUrl = $this->urlMapper->applyMappings($primaryUrl);
-        if ($patchedUrl === $primaryUrl) {
-            return;
-        }
-
-        $this->io->write(
-            \sprintf('%s(url=%s): %s', __METHOD__, $primaryUrl, $patchedUrl),
-            true,
-            IOInterface::DEBUG
-        );
-
-        /** @var $package Package */
-        $package->setDistMirrors([
-            [
-                'url'       => $patchedUrl,
-                'preferred' => true,
-            ]
-        ]);
     }
 
     /**
@@ -183,13 +142,14 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     protected function handlePreFileDownloadEvent(PreFileDownloadEvent $event): void
     {
-        $rfs = new VelocitaRemoteFilesystem(
+        $currentRfs = $event->getRemoteFilesystem();
+        $velocitaRfs = new RemoteFilesystem(
             $this->urlMapper,
             $this->io,
             $this->composer->getConfig(),
-            $event->getRemoteFilesystem()->getOptions()
+            $currentRfs->getOptions()
         );
-        $event->setRemoteFilesystem($rfs);
+        $event->setRemoteFilesystem($velocitaRfs);
     }
 
     public function getConfiguration(): PluginConfig

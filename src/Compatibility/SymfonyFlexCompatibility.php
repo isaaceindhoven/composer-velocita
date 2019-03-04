@@ -6,15 +6,15 @@ namespace ISAAC\Velocita\Composer\Compatibility;
 
 use Closure;
 use Composer\Composer;
-use Composer\EventDispatcher\EventDispatcher;
-use Composer\Installer\InstallerEvents;
 use Composer\IO\IOInterface;
-use ISAAC\Velocita\Composer\Composer\PluginHelper;
+use ISAAC\Velocita\Composer\UrlMapper;
+use Symfony\Flex\Downloader;
+use Symfony\Flex\Flex;
 
 /**
- * Symfony Flex and Velocita work great together; however, Flex installs an event listener with the highest priority
- * possible which conflicts with Velocita's desire to update packages' distribution URLs. To make sure Velocita runs
- * before Flex does, we decrease the priority of Flex's event listener.
+ * Symfony Flex and Velocita work great together, but the parallel dist file prefetcher in Flex is implemented as a new
+ * RemoteFilesystem that completely bypasses any RFS already in place. Velocita fixes compatibility with Flex by
+ * replacing their RemoteFilesystem with our own extension, which then redirects URLs to the Velocita proxy.
  */
 class SymfonyFlexCompatibility implements CompatibilityFix
 {
@@ -26,76 +26,42 @@ class SymfonyFlexCompatibility implements CompatibilityFix
      * @var IOInterface
      */
     private $io;
+    /**
+     * @var UrlMapper
+     */
+    private $urlMapper;
 
-    public function __construct(Composer $composer, IOInterface $io)
+    public function __construct(Composer $composer, IOInterface $io, UrlMapper $urlMapper)
     {
         $this->composer = $composer;
         $this->io = $io;
+        $this->urlMapper = $urlMapper;
     }
 
-    public function applyFix(): void
+    public function applyPluginFix(object $plugin): void
     {
-        $eventName = InstallerEvents::POST_DEPENDENCIES_SOLVING;
-        $priority = \PHP_INT_MAX;
-        $pluginClass = 'Symfony\\Flex\\Flex';
+        $composer = $this->composer;
+        $io = $this->io;
+        $urlMapper = $this->urlMapper;
 
-        $eventDispatcher = $this->composer->getEventDispatcher();
-        $flexListener = $this->findListener($eventDispatcher, $eventName, $priority, $pluginClass);
-        if ($flexListener === null) {
-            return;
-        }
-
-        $this->removeListener($eventDispatcher, $eventName, $priority, $flexListener);
-
-        $newPriority = $priority - 1;
-        $eventDispatcher->addListener($eventName, $flexListener, $newPriority);
-
-        $this->io->write(
-            \sprintf('%s(): successfully deprioritized %s', __METHOD__, $pluginClass),
-            true,
-            IOInterface::DEBUG
-        );
-    }
-
-    private function findListener(
-        EventDispatcher $eventDispatcher,
-        string $eventName,
-        int $priority,
-        string $class
-    ): ?callable {
-        $findListener = Closure::bind(function () use ($eventName, $priority, $class): ?callable {
-            if (!\array_key_exists($eventName, $this->listeners)
-                    || !\array_key_exists($priority, $this->listeners[$eventName])) {
-                return null;
-            }
-
-            foreach ($this->listeners[$eventName][$priority] as $listener) {
-                if (\is_array($listener) && \is_callable($listener)
-                        && PluginHelper::getOriginalClassName(\get_class($listener[0])) === $class) {
-                    return $listener;
-                }
-            }
-            return null;
-        }, $eventDispatcher, EventDispatcher::class);
-        return $findListener();
-    }
-
-    private function removeListener(
-        EventDispatcher $eventDispatcher,
-        string $eventName,
-        int $priority,
-        callable $listener
-    ): void {
-        $removeListener = Closure::bind(function () use ($eventName, $priority, $listener): void {
-            $this->listeners[$eventName][$priority] = \array_values(
-                \array_filter(
-                    $this->listeners[$eventName][$priority],
-                    function ($currentListener) use ($listener): bool {
-                        return $currentListener !== $listener;
-                    }
-                )
+        $wrapRfs = Closure::bind(function () use ($composer, $io, $urlMapper): void {
+            $oldRfs = $this->rfs;
+            $velocitaRfs = new SymfonyFlexFilesystem(
+                $urlMapper,
+                $io,
+                $composer->getConfig(),
+                $oldRfs->getOptions(),
+                $oldRfs->isTlsDisabled()
             );
-        }, $eventDispatcher, EventDispatcher::class);
-        $removeListener();
+            $this->rfs = $velocitaRfs;
+
+            $fixDownloader = Closure::bind(function () use ($velocitaRfs): void {
+                $this->rfs = $velocitaRfs;
+            }, $this->downloader, Downloader::class);
+            $fixDownloader();
+        }, $plugin, Flex::class);
+        $wrapRfs();
+
+        $this->io->write(\sprintf('%s(): successfully wrapped Flex RFS', __METHOD__), true, IOInterface::DEBUG);
     }
 }

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ISAAC\Velocita\Composer\Util;
+namespace ISAAC\Velocita\Composer\Compatibility;
 
-use Composer\Config as ComposerConfig;
+use Composer\Config;
 use Composer\IO\IOInterface;
-use Composer\Util\RemoteFilesystem;
 use ISAAC\Velocita\Composer\UrlMapper;
+use Symfony\Flex\ParallelDownloader;
 
-class VelocitaRemoteFilesystem extends RemoteFilesystem
+class SymfonyFlexFilesystem extends ParallelDownloader
 {
     /**
      * @var UrlMapper
@@ -23,10 +23,11 @@ class VelocitaRemoteFilesystem extends RemoteFilesystem
     public function __construct(
         UrlMapper $urlMapper,
         IOInterface $io,
-        ComposerConfig $config = null,
-        array $options = []
+        Config $config = null,
+        array $options = [],
+        bool $disableTls = false
     ) {
-        parent::__construct($io, $config, $options);
+        parent::__construct($io, $config, $options, $disableTls);
 
         $this->urlMapper = $urlMapper;
         $this->io = $io;

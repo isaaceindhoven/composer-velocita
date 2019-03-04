@@ -6,5 +6,5 @@ namespace ISAAC\Velocita\Composer\Compatibility;
 
 interface CompatibilityFix
 {
-    public function applyFix(): void;
+    public function applyPluginFix(object $plugin): void;
 }

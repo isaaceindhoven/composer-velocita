@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace ISAAC\Velocita\Composer\Compatibility;
 
 use Composer\Composer;
+use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
+use ISAAC\Velocita\Composer\Composer\OperationAdapter;
 use ISAAC\Velocita\Composer\Composer\PluginHelper;
+use ISAAC\Velocita\Composer\UrlMapper;
 
 class CompatibilityDetector
 {
+    private const PACKAGE_INSTALL_TRIGGERS = [
+        'symfony/flex' => SymfonyFlexCompatibility::class,
+    ];
     private const PLUGIN_CLASS_COMPATIBILITY = [
         'Symfony\\Flex\\Flex' => SymfonyFlexCompatibility::class,
     ];
@@ -22,11 +28,16 @@ class CompatibilityDetector
      * @var IOInterface
      */
     private $io;
+    /**
+     * @var UrlMapper
+     */
+    private $urlMapper;
 
-    public function __construct(Composer $composer, IOInterface $io)
+    public function __construct(Composer $composer, IOInterface $io, UrlMapper $urlMapper)
     {
         $this->composer = $composer;
         $this->io = $io;
+        $this->urlMapper = $urlMapper;
     }
 
     public function fixCompatibility(): void
@@ -34,7 +45,7 @@ class CompatibilityDetector
         $this->fixPluginCompatibility();
     }
 
-    private function fixPluginCompatibility(): void
+    protected function fixPluginCompatibility(): void
     {
         $pluginManager = $this->composer->getPluginManager();
         foreach ($pluginManager->getPlugins() as $plugin) {
@@ -52,8 +63,21 @@ class CompatibilityDetector
             );
 
             /** @var CompatibilityFix $fixInstance */
-            $fixInstance = new $fixClass($this->composer, $this->io);
-            $fixInstance->applyFix();
+            $fixInstance = new $fixClass($this->composer, $this->io, $this->urlMapper);
+            $fixInstance->applyPluginFix($plugin);
         }
+    }
+
+    public function onPackageInstall(PackageEvent $event): void
+    {
+        $operation = new OperationAdapter($event->getOperation());
+        $package = $operation->getPackage();
+        $packageName = $package->getName();
+
+        if (!\array_key_exists($packageName, static::PACKAGE_INSTALL_TRIGGERS)) {
+            return;
+        }
+
+        $this->fixCompatibility();
     }
 }
