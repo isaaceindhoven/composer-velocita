@@ -23,9 +23,10 @@ class RemoteFilesystem extends ComposerFilesystem
         UrlMapper $urlMapper,
         IOInterface $io,
         ComposerConfig $config = null,
-        array $options = []
+        array $options = [],
+        bool $disableTls = false
     ) {
-        parent::__construct($io, $config, $options);
+        parent::__construct($io, $config, $options, $disableTls);
 
         $this->urlMapper = $urlMapper;
         $this->io = $io;

@@ -147,7 +147,8 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             $this->urlMapper,
             $this->io,
             $this->composer->getConfig(),
-            $currentRfs->getOptions()
+            $currentRfs->getOptions(),
+            $currentRfs->isTlsDisabled()
         );
         $event->setRemoteFilesystem($velocitaRfs);
     }
