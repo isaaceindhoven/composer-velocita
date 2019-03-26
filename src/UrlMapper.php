@@ -28,7 +28,7 @@ class UrlMapper
 
     public function applyMappings(string $url): string
     {
-        $patchedUrl = $url;
+        $patchedUrl = $this->applyGitHubShortcut($url);
 
         foreach ($this->mappings as $mapping) {
             $prefix = $mapping->getNormalizedUrl();
@@ -46,5 +46,22 @@ class UrlMapper
         }
 
         return $patchedUrl;
+    }
+
+    protected function applyGitHubShortcut(string $url): string
+    {
+        $matches = [];
+        if (\preg_match(
+            '#^https://api.github.com/repos/(?<package>.+)/zipball/(?<hash>[0-9a-f]+)$#i',
+            $url,
+            $matches
+        )) {
+            return \sprintf(
+                'https://codeload.github.com/%s/legacy.zip/%s',
+                $matches['package'],
+                $matches['hash']
+            );
+        }
+        return $url;
     }
 }
