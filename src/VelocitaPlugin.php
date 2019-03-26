@@ -176,7 +176,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
     {
         $remoteConfigUrl = \sprintf(static::REMOTE_CONFIG_URL, $url);
         $remoteConfigJSON = \file_get_contents($remoteConfigUrl);
-        $remoteConfigData = \json_decode((string)$remoteConfigJSON, true);
+        $remoteConfigData = \json_decode((string) $remoteConfigJSON, true);
         return RemoteConfig::fromArray($remoteConfigData);
     }
 }
