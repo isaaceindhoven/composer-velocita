@@ -36,7 +36,10 @@ class SymfonyFlexCompatibility implements CompatibilityFix
         $this->urlMapper = $urlMapper;
     }
 
-    public function applyPluginFix(object $plugin): void
+    /**
+     * @inheritdoc
+     */
+    public function applyPluginFix($plugin): void
     {
         $composer = $this->composer;
         $io = $this->io;

@@ -25,7 +25,10 @@ class PrestissimoCompatibility implements CompatibilityFix
         $this->io = $io;
     }
 
-    public function applyPluginFix(object $plugin): void
+    /**
+     * @inheritdoc
+     */
+    public function applyPluginFix($plugin): void
     {
         /** @var PrestissimoPlugin $plugin */
         $plugin->disable();

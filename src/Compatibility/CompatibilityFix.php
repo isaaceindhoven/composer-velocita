@@ -6,5 +6,8 @@ namespace ISAAC\Velocita\Composer\Compatibility;
 
 interface CompatibilityFix
 {
-    public function applyPluginFix(object $plugin): void;
+    /**
+     * @param mixed $plugin
+     */
+    public function applyPluginFix($plugin): void;
 }
