@@ -131,7 +131,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         /*
          * Handle all exceptions that ::handlePreFileDownloadEvent() might throw at us by being verbose about it.
          *
-         * Unfortunately we need to do this; at least in Composer 1.6.3 EventDispatcher ignores exceptions causing its
+         * Unfortunately we need to do this; at least in Composer 1.8.4 EventDispatcher ignores exceptions causing its
          * circular invocation detection to trigger as soon as a second event of the same type is dispatched.
          */
         try {
