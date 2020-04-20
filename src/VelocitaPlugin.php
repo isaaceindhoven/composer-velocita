@@ -68,6 +68,20 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $this->initialize();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+    }
+
     private function initialize(): void
     {
         $this->configPath = \sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), static::CONFIG_FILE);
@@ -107,7 +121,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             return [];
         }
         return [
-            InstallerEvents::PRE_DEPENDENCIES_SOLVING => ['onPreDependenciesSolving', \PHP_INT_MAX],
+            InstallerEvents::PRE_OPERATIONS_EXEC => ['onPreDependenciesSolving', \PHP_INT_MAX],
             PackageEvents::POST_PACKAGE_INSTALL       => ['onPostPackageInstall', 0],
             PluginEvents::PRE_FILE_DOWNLOAD           => ['onPreFileDownload', 0],
         ];
@@ -150,15 +164,13 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     protected function handlePreFileDownloadEvent(PreFileDownloadEvent $event): void
     {
-        $currentRfs = $event->getRemoteFilesystem();
-        $velocitaRfs = new RemoteFilesystem(
-            $this->urlMapper,
+        $currentRfs = $event->getHttpDownloader();
+        $velocitaRfs = new HttpDownloader(
             $this->io,
             $this->composer->getConfig(),
-            $currentRfs->getOptions(),
-            $currentRfs->isTlsDisabled()
+            $currentRfs->getOptions()
         );
-        $event->setRemoteFilesystem($velocitaRfs);
+        $event->setHttpDownloader($velocitaRfs);
     }
 
     public function getConfiguration(): PluginConfig
