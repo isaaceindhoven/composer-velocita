@@ -18,8 +18,8 @@ use function sprintf;
 class CompatibilityDetector
 {
     private const PACKAGE_INSTALL_TRIGGERS = [
-        'hirak/prestissimo' => PrestissimoCompatibility::class,
-        'symfony/flex' => SymfonyFlexCompatibility::class,
+        'hirak/prestissimo' => true,
+        'symfony/flex' => true,
     ];
     private const PLUGIN_CLASS_COMPATIBILITY = [
         'Hirak\\Prestissimo\\Plugin' => PrestissimoCompatibility::class,
@@ -61,12 +61,7 @@ class CompatibilityDetector
         return $this->urlMapper;
     }
 
-    public function fixCompatibility(): void
-    {
-        $this->fixPluginCompatibility();
-    }
-
-    protected function fixPluginCompatibility(): void
+    public function fixPluginCompatibility(): void
     {
         $pluginManager = $this->composer->getPluginManager();
         foreach ($pluginManager->getPlugins() as $plugin) {
@@ -99,6 +94,6 @@ class CompatibilityDetector
             return;
         }
 
-        $this->fixCompatibility();
+        $this->fixPluginCompatibility();
     }
 }

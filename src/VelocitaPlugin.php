@@ -124,7 +124,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     public function onPreDependenciesSolving(): void
     {
-        $this->compatibilityDetector->fixCompatibility();
+        $this->compatibilityDetector->fixPluginCompatibility();
     }
 
     public function onPostPackageInstall(PackageEvent $event): void
