@@ -4,14 +4,14 @@
 [![Total Downloads](https://poser.pugx.org/isaac/composer-velocita/downloads)](https://packagist.org/packages/isaac/composer-velocita)
 [![License](https://poser.pugx.org/isaac/composer-velocita/license)](https://packagist.org/packages/isaac/composer-velocita)
 
-A Composer plugin that enables transparent Velocita caching for your projects.
+Fast and reliable Composer package downloads by using [Velocita](https://github.com/isaaceindhoven/velocita).
 
 ## Getting Started
 
 ### Prerequisites
 
 * PHP 7.2 or newer
-* A running [Velocita](https://github.com/isaaceindhoven/velocita) instance
+* A running Velocita instance
 * Compatible with Composer 1
 
 ### Installation
