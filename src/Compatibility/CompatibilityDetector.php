@@ -11,6 +11,10 @@ use ISAAC\Velocita\Composer\Composer\OperationAdapter;
 use ISAAC\Velocita\Composer\Composer\PluginHelper;
 use ISAAC\Velocita\Composer\UrlMapper;
 
+use function array_key_exists;
+use function get_class;
+use function sprintf;
+
 class CompatibilityDetector
 {
     private const PACKAGE_INSTALL_TRIGGERS = [
@@ -42,6 +46,21 @@ class CompatibilityDetector
         $this->urlMapper = $urlMapper;
     }
 
+    public function getComposer(): Composer
+    {
+        return $this->composer;
+    }
+
+    public function getIo(): IOInterface
+    {
+        return $this->io;
+    }
+
+    public function getUrlMapper(): UrlMapper
+    {
+        return $this->urlMapper;
+    }
+
     public function fixCompatibility(): void
     {
         $this->fixPluginCompatibility();
@@ -51,21 +70,21 @@ class CompatibilityDetector
     {
         $pluginManager = $this->composer->getPluginManager();
         foreach ($pluginManager->getPlugins() as $plugin) {
-            $pluginClass = PluginHelper::getOriginalClassName(\get_class($plugin));
+            $pluginClass = PluginHelper::getOriginalClassName(get_class($plugin));
 
-            if (!\array_key_exists($pluginClass, static::PLUGIN_CLASS_COMPATIBILITY)) {
+            if (!array_key_exists($pluginClass, static::PLUGIN_CLASS_COMPATIBILITY)) {
                 continue;
             }
             $fixClass = static::PLUGIN_CLASS_COMPATIBILITY[$pluginClass];
 
             $this->io->write(
-                \sprintf('%s(): plugin %s detected; running compatibility fix %s', __METHOD__, $pluginClass, $fixClass),
+                sprintf('%s(): plugin %s detected; running compatibility fix %s', __METHOD__, $pluginClass, $fixClass),
                 true,
                 IOInterface::DEBUG
             );
 
             /** @var CompatibilityFix $fixInstance */
-            $fixInstance = new $fixClass($this->composer, $this->io, $this->urlMapper);
+            $fixInstance = new $fixClass($this);
             $fixInstance->applyPluginFix($plugin);
         }
     }
@@ -76,7 +95,7 @@ class CompatibilityDetector
         $package = $operation->getPackage();
         $packageName = $package->getName();
 
-        if (!\array_key_exists($packageName, static::PACKAGE_INSTALL_TRIGGERS)) {
+        if (!array_key_exists($packageName, static::PACKAGE_INSTALL_TRIGGERS)) {
             return;
         }
 

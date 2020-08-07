@@ -6,8 +6,17 @@ namespace ISAAC\Velocita\Composer;
 
 use ISAAC\Velocita\Composer\Config\MirrorMapping;
 
+use function ltrim;
+use function preg_match;
+use function preg_quote;
+use function rtrim;
+use function sprintf;
+use function trim;
+
 class UrlMapper
 {
+    private const GITHUB_REGEX = '#^https://api.github.com/repos/(?<package>.+)/zipball/(?<hash>[0-9a-f]+)$#i';
+
     /**
      * @var MirrorMapping[]
      */
@@ -32,14 +41,14 @@ class UrlMapper
 
         foreach ($this->mappings as $mapping) {
             $prefix = $mapping->getNormalizedUrl();
-            $regex = \sprintf('#^https?:%s(?<path>.+)$#i', \preg_quote($prefix));
+            $regex = sprintf('#^https?:%s(?<path>.+)$#i', preg_quote($prefix));
             $matches = [];
-            if (\preg_match($regex, $patchedUrl, $matches)) {
-                $patchedUrl = \sprintf(
+            if (preg_match($regex, $patchedUrl, $matches) === 1) {
+                $patchedUrl = sprintf(
                     '%s/%s/%s',
-                    \rtrim($this->rootUrl, '/'),
-                    \trim($mapping->getPath(), '/'),
-                    \ltrim($matches['path'], '/')
+                    rtrim($this->rootUrl, '/'),
+                    trim($mapping->getPath(), '/'),
+                    ltrim($matches['path'], '/')
                 );
                 break;
             }
@@ -51,12 +60,8 @@ class UrlMapper
     protected function applyGitHubShortcut(string $url): string
     {
         $matches = [];
-        if (\preg_match(
-            '#^https://api.github.com/repos/(?<package>.+)/zipball/(?<hash>[0-9a-f]+)$#i',
-            $url,
-            $matches
-        )) {
-            return \sprintf(
+        if (preg_match(static::GITHUB_REGEX, $url, $matches) === 1) {
+            return sprintf(
                 'https://codeload.github.com/%s/legacy.zip/%s',
                 $matches['package'],
                 $matches['hash']

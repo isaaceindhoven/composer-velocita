@@ -6,6 +6,11 @@ namespace ISAAC\Velocita\Composer\Config;
 
 use RuntimeException;
 
+use function filter_var;
+use function rtrim;
+
+use const FILTER_VALIDATE_URL;
+
 class PluginConfig
 {
     /**
@@ -37,14 +42,14 @@ class PluginConfig
         if ($url === null) {
             $this->url = null;
         } else {
-            $this->url = \rtrim($url, '/');
+            $this->url = rtrim($url, '/');
         }
     }
 
     public function validate(): void
     {
         // If set, the URL must be valid
-        if (($this->url !== null) && !\filter_var($this->url, \FILTER_VALIDATE_URL)) {
+        if (($this->url !== null) && !filter_var($this->url, FILTER_VALIDATE_URL)) {
             throw new RuntimeException('Invalid URL was set for this plugin');
         }
 

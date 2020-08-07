@@ -7,6 +7,9 @@ namespace ISAAC\Velocita\Composer\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use UnexpectedValueException;
 
+use function is_array;
+use function sprintf;
+
 class InputInterfaceAdapter
 {
     /**
@@ -22,9 +25,9 @@ class InputInterfaceAdapter
     public function getStringArgument(string $name): ?string
     {
         $value = $this->input->getArgument($name);
-        if (\is_array($value)) {
+        if (is_array($value)) {
             throw new UnexpectedValueException(
-                \sprintf('Expected string but got array for input argument "%s"', $name)
+                sprintf('Expected string but got array for input argument "%s"', $name)
             );
         }
         return $value;

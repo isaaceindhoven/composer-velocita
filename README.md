@@ -10,9 +10,9 @@ A Composer plugin that enables transparent Velocita caching for your projects.
 
 ### Prerequisites
 
-* PHP 7.1 or newer
-* Composer
+* PHP 7.2 or newer
 * A running [Velocita](https://github.com/isaaceindhoven/velocita) instance
+* Compatible with Composer 1
 
 ### Installation
 

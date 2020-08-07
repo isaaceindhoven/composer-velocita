@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace ISAAC\Velocita\Composer\Compatibility;
 
 use Closure;
-use Composer\Composer;
 use Composer\IO\IOInterface;
-use ISAAC\Velocita\Composer\UrlMapper;
+
+use function get_class;
+use function sprintf;
 
 /**
  * Symfony Flex and Velocita work great together, but the parallel dist file prefetcher in Flex is implemented as a new
@@ -17,23 +18,13 @@ use ISAAC\Velocita\Composer\UrlMapper;
 class SymfonyFlexCompatibility implements CompatibilityFix
 {
     /**
-     * @var Composer
+     * @var CompatibilityDetector
      */
-    private $composer;
-    /**
-     * @var IOInterface
-     */
-    private $io;
-    /**
-     * @var UrlMapper
-     */
-    private $urlMapper;
+    private $compatibilityDetector;
 
-    public function __construct(Composer $composer, IOInterface $io, UrlMapper $urlMapper)
+    public function __construct(CompatibilityDetector $compatibilityDetector)
     {
-        $this->composer = $composer;
-        $this->io = $io;
-        $this->urlMapper = $urlMapper;
+        $this->compatibilityDetector = $compatibilityDetector;
     }
 
     /**
@@ -41,9 +32,9 @@ class SymfonyFlexCompatibility implements CompatibilityFix
      */
     public function applyPluginFix($plugin): void
     {
-        $composer = $this->composer;
-        $io = $this->io;
-        $urlMapper = $this->urlMapper;
+        $composer = $this->compatibilityDetector->getComposer();
+        $io = $this->compatibilityDetector->getIo();
+        $urlMapper = $this->compatibilityDetector->getUrlMapper();
 
         $wrapRfs = Closure::bind(function () use ($composer, $io, $urlMapper): void {
             $oldRfs = $this->rfs;
@@ -58,11 +49,11 @@ class SymfonyFlexCompatibility implements CompatibilityFix
 
             $fixDownloader = Closure::bind(function () use ($velocitaRfs): void {
                 $this->rfs = $velocitaRfs;
-            }, $this->downloader, \get_class($this->downloader));
+            }, $this->downloader, get_class($this->downloader));
             $fixDownloader();
-        }, $plugin, \get_class($plugin));
+        }, $plugin, get_class($plugin));
         $wrapRfs();
 
-        $this->io->write(\sprintf('%s(): successfully wrapped Flex RFS', __METHOD__), true, IOInterface::DEBUG);
+        $io->write(sprintf('%s(): successfully wrapped Flex RFS', __METHOD__), true, IOInterface::DEBUG);
     }
 }

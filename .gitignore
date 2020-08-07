@@ -1,4 +1,6 @@
 /.docksal/
+/.env
 /.idea/
 /composer.lock
+/symfony.lock
 /vendor/

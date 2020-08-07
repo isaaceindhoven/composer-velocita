@@ -28,10 +28,12 @@ class OperationAdapter
 
     public function getPackage(): Package
     {
-        if (($this->operation instanceof InstallOperation)
-                || ($this->operation instanceof MarkAliasInstalledOperation)
-                || ($this->operation instanceof MarkAliasUninstalledOperation)
-                || ($this->operation instanceof UninstallOperation)) {
+        if (
+            $this->operation instanceof InstallOperation
+            || $this->operation instanceof MarkAliasInstalledOperation
+            || $this->operation instanceof MarkAliasUninstalledOperation
+            || $this->operation instanceof UninstallOperation
+        ) {
             $package = $this->operation->getPackage();
         } elseif ($this->operation instanceof UpdateOperation) {
             $package = $this->operation->getTargetPackage();

@@ -1,8 +1,4 @@
 parameters:
-  level: 7
+  level: max
   paths:
-    - %rootDir%/../../../src/
-  excludes_analyse:
-    # Ignore compatibility fixes since including their dependencies would load the Composer plugins
-    - %rootDir%/../../../src/Compatibility/PrestissimoCompatibility.php
-    - %rootDir%/../../../src/Compatibility/SymfonyFlex*.php
+    - src/

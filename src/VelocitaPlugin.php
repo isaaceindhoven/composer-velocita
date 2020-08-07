@@ -25,6 +25,12 @@ use ISAAC\Velocita\Composer\Config\PluginConfigWriter;
 use ISAAC\Velocita\Composer\Config\RemoteConfig;
 use LogicException;
 
+use function file_get_contents;
+use function json_decode;
+use function sprintf;
+
+use const PHP_INT_MAX;
+
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     protected const CONFIG_FILE = 'velocita.json';
@@ -70,7 +76,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     private function initialize(): void
     {
-        $this->configPath = \sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), static::CONFIG_FILE);
+        $this->configPath = sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), static::CONFIG_FILE);
         $this->config = (new PluginConfigReader())->readOrNew($this->configPath);
 
         static::$enabled = $this->config->isEnabled();
@@ -85,7 +91,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         try {
             $remoteConfig = $this->getRemoteConfig($url);
         } catch (Exception $e) {
-            $this->io->writeError(\sprintf('Failed to retrieve remote config: %s', $e->getMessage()));
+            $this->io->writeError(sprintf('Failed to retrieve remote config: %s', $e->getMessage()));
             static::$enabled = false;
             return;
         }
@@ -101,13 +107,16 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         ];
     }
 
+    /**
+     * @return array<string, array{string, int}>
+     */
     public static function getSubscribedEvents(): array
     {
         if (!static::$enabled) {
             return [];
         }
         return [
-            InstallerEvents::PRE_DEPENDENCIES_SOLVING => ['onPreDependenciesSolving', \PHP_INT_MAX],
+            InstallerEvents::PRE_DEPENDENCIES_SOLVING => ['onPreDependenciesSolving', PHP_INT_MAX],
             PackageEvents::POST_PACKAGE_INSTALL       => ['onPostPackageInstall', 0],
             PluginEvents::PRE_FILE_DOWNLOAD           => ['onPreFileDownload', 0],
         ];
@@ -138,7 +147,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             $this->handlePreFileDownloadEvent($event);
         } catch (Exception $e) {
             $this->io->writeError(
-                \sprintf(
+                sprintf(
                     "<error>Velocita: exception thrown in event handler: %s\n%s</error>",
                     $e->getMessage(),
                     $e->getTraceAsString()
@@ -174,9 +183,9 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     protected function getRemoteConfig(string $url): RemoteConfig
     {
-        $remoteConfigUrl = \sprintf(static::REMOTE_CONFIG_URL, $url);
-        $remoteConfigJSON = \file_get_contents($remoteConfigUrl);
-        $remoteConfigData = \json_decode((string) $remoteConfigJSON, true);
+        $remoteConfigUrl = sprintf(static::REMOTE_CONFIG_URL, $url);
+        $remoteConfigJSON = file_get_contents($remoteConfigUrl);
+        $remoteConfigData = json_decode((string) $remoteConfigJSON, true);
         return RemoteConfig::fromArray($remoteConfigData);
     }
 }

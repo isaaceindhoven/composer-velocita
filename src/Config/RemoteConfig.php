@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace ISAAC\Velocita\Composer\Config;
 
+use UnexpectedValueException;
+
+use function array_key_exists;
+
 class RemoteConfig
 {
     /**
@@ -11,12 +15,17 @@ class RemoteConfig
      */
     protected $mirrors = [];
 
+    /**
+     * @param array{mirrors?: array{url?: string, path?: string}[]} $data
+     */
     public static function fromArray(array $data): RemoteConfig
     {
         $config = new RemoteConfig();
 
-        $mirrors = $data['mirrors'] ?? [];
-        foreach ($mirrors as $mappingData) {
+        if (!array_key_exists('mirrors', $data)) {
+            throw new UnexpectedValueException('Missing `mirrors` key in data');
+        }
+        foreach ($data['mirrors'] as $mappingData) {
             $config->addMirror(MirrorMapping::fromArray($mappingData));
         }
 

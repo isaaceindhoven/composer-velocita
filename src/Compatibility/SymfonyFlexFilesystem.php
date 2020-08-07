@@ -9,6 +9,8 @@ use Composer\IO\IOInterface;
 use ISAAC\Velocita\Composer\UrlMapper;
 use Symfony\Flex\ParallelDownloader;
 
+use function sprintf;
+
 class SymfonyFlexFilesystem extends ParallelDownloader
 {
     /**
@@ -20,10 +22,13 @@ class SymfonyFlexFilesystem extends ParallelDownloader
      */
     protected $io;
 
+    /**
+     * @param array<int|string, mixed> $options
+     */
     public function __construct(
         UrlMapper $urlMapper,
         IOInterface $io,
-        Config $config = null,
+        Config $config,
         array $options = [],
         bool $disableTls = false
     ) {
@@ -33,23 +38,24 @@ class SymfonyFlexFilesystem extends ParallelDownloader
         $this->io = $io;
     }
 
-    protected function patchURL(string $url): string
+    protected function patchUrl(string $url): string
     {
         $patchedUrl = $this->urlMapper->applyMappings($url);
 
         if ($patchedUrl !== $url) {
-            $this->io->write(\sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
+            $this->io->write(sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
         }
 
         return $patchedUrl;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     * @param array<int|string, mixed> $additionalOptions
      */
     protected function get($originUrl, $fileUrl, $additionalOptions = [], $fileName = null, $progress = true)
     {
-        $patchedUrl = $this->patchURL($fileUrl);
+        $patchedUrl = $this->patchUrl($fileUrl);
         return parent::get($originUrl, $patchedUrl, $additionalOptions, $fileName, $progress);
     }
 }

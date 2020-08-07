@@ -8,6 +8,8 @@ use Composer\Config as ComposerConfig;
 use Composer\IO\IOInterface;
 use Composer\Util\RemoteFilesystem as ComposerFilesystem;
 
+use function sprintf;
+
 class RemoteFilesystem extends ComposerFilesystem
 {
     /**
@@ -19,6 +21,9 @@ class RemoteFilesystem extends ComposerFilesystem
      */
     protected $io;
 
+    /**
+     * @param array<string|int, mixed> $options
+     */
     public function __construct(
         UrlMapper $urlMapper,
         IOInterface $io,
@@ -32,23 +37,24 @@ class RemoteFilesystem extends ComposerFilesystem
         $this->io = $io;
     }
 
-    protected function patchURL(string $url): string
+    protected function patchUrl(string $url): string
     {
         $patchedUrl = $this->urlMapper->applyMappings($url);
 
         if ($patchedUrl !== $url) {
-            $this->io->write(\sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
+            $this->io->write(sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
         }
 
         return $patchedUrl;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     * @param array<string|int, mixed> $additionalOptions
      */
     protected function get($originUrl, $fileUrl, $additionalOptions = [], $fileName = null, $progress = true)
     {
-        $patchedUrl = $this->patchURL($fileUrl);
+        $patchedUrl = $this->patchUrl($fileUrl);
         return parent::get($originUrl, $patchedUrl, $additionalOptions, $fileName, $progress);
     }
 }

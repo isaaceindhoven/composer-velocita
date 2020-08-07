@@ -14,6 +14,9 @@ class CommandProvider implements CommandProviderCapability
      */
     protected $plugin;
 
+    /**
+     * @param array{plugin: VelocitaPlugin} $arguments
+     */
     public function __construct(array $arguments)
     {
         $this->plugin = $arguments['plugin'];

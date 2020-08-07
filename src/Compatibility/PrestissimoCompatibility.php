@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace ISAAC\Velocita\Composer\Compatibility;
 
-use Composer\Composer;
-use Composer\IO\IOInterface;
-use Hirak\Prestissmo\Plugin as PrestissimoPlugin;
-use ISAAC\Velocita\Composer\UrlMapper;
+use Hirak\Prestissimo\Plugin as PrestissimoPlugin;
+
+use function sprintf;
 
 /**
  * Prestissimo's prefetcher is instantiated inline which makes patching it relatively hard, and since running Velocita
@@ -16,13 +15,13 @@ use ISAAC\Velocita\Composer\UrlMapper;
 class PrestissimoCompatibility implements CompatibilityFix
 {
     /**
-     * @var IOInterface
+     * @var CompatibilityDetector
      */
-    protected $io;
+    protected $compatibilityDetector;
 
-    public function __construct(Composer $composer, IOInterface $io, UrlMapper $urlMapper)
+    public function __construct(CompatibilityDetector $compatibilityDetector)
     {
-        $this->io = $io;
+        $this->compatibilityDetector = $compatibilityDetector;
     }
 
     /**
@@ -33,8 +32,8 @@ class PrestissimoCompatibility implements CompatibilityFix
         /** @var PrestissimoPlugin $plugin */
         $plugin->disable();
 
-        $this->io->writeError(
-            \sprintf('<warning>Disabled %s - incompatible with Velocita</warning>', PrestissimoPlugin::class)
+        $this->compatibilityDetector->getIo()->writeError(
+            sprintf('<warning>Disabled %s - incompatible with Velocita</warning>', PrestissimoPlugin::class)
         );
     }
 }
