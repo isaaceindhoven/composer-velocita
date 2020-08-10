@@ -12,7 +12,7 @@ Fast and reliable Composer package downloads by using [Velocita](https://github.
 
 * PHP 7.2 or newer
 * A running Velocita instance
-* Compatible with Composer 1
+* Compatible with Composer 1 and 2
 
 ### Installation
 
@@ -42,11 +42,6 @@ If you want to remove the plugin completely, execute:
 ```
 composer global remove isaac/composer-velocita
 ```
-
-## Known issues
-
-* The `composer create-project` command initially downloads from Packagist directly, but will use Velocita for the
-  subsequent installation of dependencies. See [Composer issue #7090](https://github.com/composer/composer/issues/7090).
 
 ## Authors
 
