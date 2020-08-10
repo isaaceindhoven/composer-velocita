@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace ISAAC\Velocita\Composer\Compatibility;
 
+use Composer\Plugin\PluginInterface;
+
 interface CompatibilityFix
 {
-    /**
-     * @param mixed $plugin
-     */
-    public function applyPluginFix($plugin): void;
+    public function applyPluginFix(PluginInterface $plugin): void;
 }

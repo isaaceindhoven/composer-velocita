@@ -18,11 +18,9 @@ use function sprintf;
 class CompatibilityDetector
 {
     private const PACKAGE_INSTALL_TRIGGERS = [
-        'hirak/prestissimo' => true,
         'symfony/flex' => true,
     ];
     private const PLUGIN_CLASS_COMPATIBILITY = [
-        'Hirak\\Prestissimo\\Plugin' => PrestissimoCompatibility::class,
         'Symfony\\Flex\\Flex' => SymfonyFlexCompatibility::class,
     ];
 

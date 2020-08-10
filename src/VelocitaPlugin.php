@@ -24,13 +24,17 @@ use ISAAC\Velocita\Composer\Config\PluginConfigReader;
 use ISAAC\Velocita\Composer\Config\PluginConfigWriter;
 use ISAAC\Velocita\Composer\Config\RemoteConfig;
 use LogicException;
+use RuntimeException;
+use UnexpectedValueException;
 
 use function file_get_contents;
+use function is_array;
 use function json_decode;
 use function sprintf;
 
 use const PHP_INT_MAX;
 
+// phpcs:ignore ObjectCalisthenics.Metrics.MethodPerClassLimit.ObjectCalisthenics\Sniffs\Metrics\MethodPerClassLimitSniff
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     protected const CONFIG_FILE = 'velocita.json';
@@ -56,7 +60,7 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
     /**
      * @var PluginConfig
      */
-    protected $config;
+    protected $configuration;
     /**
      * @var UrlMapper
      */
@@ -74,17 +78,22 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $this->initialize();
     }
 
+    public function deactivate(Composer $composer, IOInterface $io): void
+    {
+        static::$enabled = false;
+    }
+
     private function initialize(): void
     {
         $this->configPath = sprintf('%s/%s', ComposerFactory::getComposerHomeDir(), static::CONFIG_FILE);
-        $this->config = (new PluginConfigReader())->readOrNew($this->configPath);
+        $this->configuration = (new PluginConfigReader())->readOrNew($this->configPath);
 
-        static::$enabled = $this->config->isEnabled();
+        static::$enabled = $this->configuration->isEnabled();
         if (!static::$enabled) {
             return;
         }
 
-        $url = $this->config->getURL();
+        $url = $this->configuration->getURL();
         if ($url === null) {
             throw new LogicException('Velocita enabled but no URL set');
         }
@@ -98,6 +107,10 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
         $this->urlMapper = new UrlMapper($url, $remoteConfig->getMirrors());
         $this->compatibilityDetector = new CompatibilityDetector($this->composer, $this->io, $this->urlMapper);
+    }
+
+    public function uninstall(Composer $composer, IOInterface $io): void
+    {
     }
 
     public function getCapabilities(): array
@@ -116,13 +129,13 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
             return [];
         }
         return [
-            InstallerEvents::PRE_DEPENDENCIES_SOLVING => ['onPreDependenciesSolving', PHP_INT_MAX],
-            PackageEvents::POST_PACKAGE_INSTALL       => ['onPostPackageInstall', 0],
-            PluginEvents::PRE_FILE_DOWNLOAD           => ['onPreFileDownload', 0],
+            InstallerEvents::PRE_OPERATIONS_EXEC => ['onPreOperationsExec', PHP_INT_MAX],
+            PackageEvents::POST_PACKAGE_INSTALL => ['onPostPackageInstall', 0],
+            PluginEvents::PRE_FILE_DOWNLOAD => ['onPreFileDownload', 0],
         ];
     }
 
-    public function onPreDependenciesSolving(): void
+    public function onPreOperationsExec(): void
     {
         $this->compatibilityDetector->fixPluginCompatibility();
     }
@@ -132,47 +145,23 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $this->compatibilityDetector->onPackageInstall($event);
     }
 
-    /**
-     * @throws Exception
-     */
     public function onPreFileDownload(PreFileDownloadEvent $event): void
     {
-        /*
-         * Handle all exceptions that ::handlePreFileDownloadEvent() might throw at us by being verbose about it.
-         *
-         * Unfortunately we need to do this; at least in Composer 1.8.4 EventDispatcher ignores exceptions causing its
-         * circular invocation detection to trigger as soon as a second event of the same type is dispatched.
-         */
-        try {
-            $this->handlePreFileDownloadEvent($event);
-        } catch (Exception $e) {
-            $this->io->writeError(
-                sprintf(
-                    "<error>Velocita: exception thrown in event handler: %s\n%s</error>",
-                    $e->getMessage(),
-                    $e->getTraceAsString()
-                )
+        $originalUrl = $event->getProcessedUrl();
+        $mappedUrl = $this->urlMapper->applyMappings($originalUrl);
+        if ($mappedUrl !== $originalUrl) {
+            $this->io->write(
+                sprintf('%s(url=%s): mapped to %s', __METHOD__, $originalUrl, $mappedUrl),
+                true,
+                IOInterface::DEBUG
             );
-            throw $e;
         }
-    }
-
-    protected function handlePreFileDownloadEvent(PreFileDownloadEvent $event): void
-    {
-        $currentRfs = $event->getRemoteFilesystem();
-        $velocitaRfs = new RemoteFilesystem(
-            $this->urlMapper,
-            $this->io,
-            $this->composer->getConfig(),
-            $currentRfs->getOptions(),
-            $currentRfs->isTlsDisabled()
-        );
-        $event->setRemoteFilesystem($velocitaRfs);
+        $event->setProcessedUrl($mappedUrl);
     }
 
     public function getConfiguration(): PluginConfig
     {
-        return $this->config;
+        return $this->configuration;
     }
 
     public function writeConfiguration(PluginConfig $config): void
@@ -185,7 +174,13 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
     {
         $remoteConfigUrl = sprintf(static::REMOTE_CONFIG_URL, $url);
         $remoteConfigJSON = file_get_contents($remoteConfigUrl);
-        $remoteConfigData = json_decode((string) $remoteConfigJSON, true);
+        if ($remoteConfigJSON === false) {
+            throw new RuntimeException(sprintf('Remote configuration at %s unavailable', $remoteConfigUrl));
+        }
+        $remoteConfigData = json_decode($remoteConfigJSON, true);
+        if (!is_array($remoteConfigData)) {
+            throw new UnexpectedValueException('Remote configuration is formatted incorrectly');
+        }
         return RemoteConfig::fromArray($remoteConfigData);
     }
 }

@@ -41,11 +41,13 @@ class SymfonyFlexFilesystem extends ParallelDownloader
     protected function patchUrl(string $url): string
     {
         $patchedUrl = $this->urlMapper->applyMappings($url);
-
         if ($patchedUrl !== $url) {
-            $this->io->write(sprintf('%s(url=%s): %s', __METHOD__, $url, $patchedUrl), true, IOInterface::DEBUG);
+            $this->io->write(
+                sprintf('%s(url=%s): mapped to %s', __METHOD__, $url, $patchedUrl),
+                true,
+                IOInterface::DEBUG
+            );
         }
-
         return $patchedUrl;
     }
 
