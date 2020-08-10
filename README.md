@@ -12,7 +12,7 @@ Fast and reliable Composer package downloads by using [Velocita](https://github.
 
 * PHP 7.2 or newer
 * A running Velocita instance
-* Compatible with Composer 1 and 2
+* Composer 1 or 2
 
 ### Installation
 
