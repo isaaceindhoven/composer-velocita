@@ -4,7 +4,7 @@
 [![Packagist Downloads](https://img.shields.io/packagist/dt/isaac/composer-velocita)](https://packagist.org/packages/isaac/composer-velocita)
 [![License](https://img.shields.io/github/license/isaaceindhoven/composer-velocita)](https://github.com/isaaceindhoven/composer-velocita/blob/master/LICENSE)
 
-Fast and reliable Composer package downloads by using [Velocita](https://github.com/isaaceindhoven/velocita).
+Fast and reliable Composer package downloads using [Velocita](https://github.com/isaaceindhoven/velocita).
 
 ## Getting Started
 
