@@ -2,15 +2,16 @@
 set -eu
 
 # Show versions
-php -v
-composer --version
+phpVersion=$(php -i | grep -m 1 'PHP Version' | cut -d' ' -f4)
+composerVersion=$(composer --version | cut -d' ' -f3)
+echo "PHP ${phpVersion} - Composer ${composerVersion}"
 
 runInstall() {
     local outputPath="$1"
 
     rm -rf vendor
     composer clear-cache
-    composer install --no-autoloader --no-suggest --profile 2>&1 | tee "${outputPath}"
+    composer install --no-interaction --no-autoloader --no-suggest --profile -vvv 2>&1 | tee "${outputPath}"
 }
 
 installVelocita() {
@@ -27,7 +28,7 @@ disableVelocita() {
 }
 
 echo '{"require":{"phpunit/phpunit":"^8.5"}}' > composer.json
-composer install
+composer install --no-interaction --no-autoloader --no-suggest
 
 # Vanilla
 runInstall /output/vanilla-output.txt
@@ -48,11 +49,13 @@ runInstall /output/velocita-flex-output.txt
 disableVelocita
 composer global remove symfony/flex
 
-# Hirak Prestissimo
-composer global require hirak/prestissimo:^0.3
-runInstall /output/prestissimo-output.txt
+if expr match "${composerVersion}" "1.*" >/dev/null; then
+    # Hirak Prestissimo
+    composer global require hirak/prestissimo:^0.3
+    runInstall /output/prestissimo-output.txt
 
-# ISAAC Velocita + Hirak Prestissimo
-enableVelocita
-runInstall /output/velocita-prestissimo-output.txt
-composer global remove hirak/prestissimo
+    # ISAAC Velocita + Hirak Prestissimo
+    enableVelocita
+    runInstall /output/velocita-prestissimo-output.txt
+    composer global remove hirak/prestissimo
+fi
