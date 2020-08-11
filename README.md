@@ -53,6 +53,10 @@ composer global remove isaac/composer-velocita
 
 * Jelle Raaijmakers - [jelle.raaijmakers@isaac.nl](mailto:jelle.raaijmakers@isaac.nl) / [GMTA](https://github.com/GMTA)
 
+## Contributing
+
+Raise an issue or submit a pull request on [GitHub](https://github.com/isaaceindhoven/composer-velocita).
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
