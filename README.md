@@ -24,6 +24,12 @@ composer global require isaac/composer-velocita
 composer velocita:enable https://url.to.your.velocita.tld/
 ```
 
+NOTE: when using Composer 1.10.5 or lower, you need to explicitly pass a version constraint of `^2`:
+
+```
+composer global require isaac/composer-velocita:^2
+```
+
 ### Usage
 
 After enabling and configuring Velocita, it is automatically used for all Composer projects when running `require`,
