@@ -1,8 +1,8 @@
 # Velocita Composer plugin
 
-[![Latest Stable Version](https://poser.pugx.org/isaac/composer-velocita/version)](https://packagist.org/packages/isaac/composer-velocita)
-[![Total Downloads](https://poser.pugx.org/isaac/composer-velocita/downloads)](https://packagist.org/packages/isaac/composer-velocita)
-[![License](https://poser.pugx.org/isaac/composer-velocita/license)](https://packagist.org/packages/isaac/composer-velocita)
+[![Packagist Version](https://img.shields.io/packagist/v/isaac/composer-velocita)](https://packagist.org/packages/isaac/composer-velocita)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/isaac/composer-velocita)](https://packagist.org/packages/isaac/composer-velocita)
+[![License](https://img.shields.io/github/license/isaaceindhoven/composer-velocita)](https://github.com/isaaceindhoven/composer-velocita/blob/master/LICENSE)
 
 Fast and reliable Composer package downloads by using [Velocita](https://github.com/isaaceindhoven/velocita).
 
