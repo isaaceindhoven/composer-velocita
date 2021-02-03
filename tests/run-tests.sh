@@ -44,6 +44,10 @@ runTestSuite() {
 
 for phpVersion in "${phpVersions[@]}"; do
     for composerVersion in "${composerVersions[@]}"; do
-        runTestSuite "${phpVersion}" "${composerVersion}"
+        if [[ ! "${phpVersion}" =~ ^8\. ]] || [[ ! "${composerVersion}" =~ ^1\.9\. ]]; then
+            runTestSuite "${phpVersion}" "${composerVersion}"
+        fi
     done
 done
+
+echo 'All tests executed.'

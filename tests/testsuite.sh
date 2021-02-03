@@ -6,7 +6,7 @@ phpVersion=$(php -i | grep -m 1 'PHP Version' | cut -d' ' -f4)
 composerVersion=$(composer --version | cut -d' ' -f3)
 echo
 echo "PHP ${phpVersion} - Composer ${composerVersion}"
-echo '-----'
+echo '----------'
 echo
 
 runInstall() {
@@ -31,7 +31,6 @@ disableVelocita() {
 }
 
 echo '{"require":{"phpunit/phpunit":"^9.5"}}' > composer.json
-composer install --no-interaction --no-autoloader --no-suggest
 
 # Vanilla
 runInstall /output/vanilla-output.txt
@@ -49,5 +48,3 @@ runInstall /output/flex-output.txt
 # ISAAC Velocita + Symfony Flex
 enableVelocita
 runInstall /output/velocita-flex-output.txt
-disableVelocita
-composer global remove symfony/flex
