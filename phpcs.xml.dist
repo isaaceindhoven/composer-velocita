@@ -57,26 +57,6 @@
     <rule ref="PSR12.Operators.OperatorSpacing"/>
 
     <!-- 3rd party -->
-    <rule ref="ObjectCalisthenics.Files.FunctionLength">
-        <properties>
-            <property name="maxLength" value="25"/>
-        </properties>
-    </rule>
-    <rule ref="ObjectCalisthenics.Metrics.MaxNestingLevel">
-        <properties>
-            <property name="maxNestingLevel" value="3"/>
-        </properties>
-    </rule>
-    <rule ref="ObjectCalisthenics.Metrics.MethodPerClassLimit">
-        <properties>
-            <property name="maxCount" value="10"/>
-        </properties>
-    </rule>
-    <rule ref="ObjectCalisthenics.Metrics.PropertyPerClassLimit">
-        <properties>
-            <property name="maxCount" value="10"/>
-        </properties>
-    </rule>
     <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/>
     <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility"/>
     <rule ref="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces">
