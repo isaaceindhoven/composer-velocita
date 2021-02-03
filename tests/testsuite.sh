@@ -51,14 +51,3 @@ enableVelocita
 runInstall /output/velocita-flex-output.txt
 disableVelocita
 composer global remove symfony/flex
-
-if expr match "${composerVersion}" "1.*" >/dev/null; then
-    # Hirak Prestissimo
-    composer global require hirak/prestissimo:^0.3
-    runInstall /output/prestissimo-output.txt
-
-    # ISAAC Velocita + Hirak Prestissimo
-    enableVelocita
-    runInstall /output/velocita-prestissimo-output.txt
-    composer global remove hirak/prestissimo
-fi
