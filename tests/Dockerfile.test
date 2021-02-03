@@ -7,10 +7,12 @@ FROM composer:${COMPOSER_VERSION} AS composer_base
 # PHP image
 FROM php:${PHP_VERSION}-cli-alpine3.13
 
-LABEL maintainer="Jelle Raaijmakers <jelle.raaijmakers@isaac.nl>"
+LABEL maintainer="Jelle Raaijmakers <jelle@gmta.nl>"
+
+ARG USER_UID
 
 RUN apk --no-cache upgrade \
-    && adduser -S testuser
+    && adduser -S -u ${USER_UID} testuser
 
 RUN mkdir /test \
     && chown testuser /test \

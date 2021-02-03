@@ -4,7 +4,10 @@ set -eu
 # Show versions
 phpVersion=$(php -i | grep -m 1 'PHP Version' | cut -d' ' -f4)
 composerVersion=$(composer --version | cut -d' ' -f3)
+echo
 echo "PHP ${phpVersion} - Composer ${composerVersion}"
+echo '-----'
+echo
 
 runInstall() {
     local outputPath="$1"

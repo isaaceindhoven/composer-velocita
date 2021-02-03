@@ -18,10 +18,12 @@ buildImage() {
     local composerVersion=$2
 
     local contextDir=$(dirname $0)/../
+    local userUid=$(id -u)
 
     DOCKER_BUILDKIT=1 docker build \
         --build-arg PHP_VERSION="${phpVersion}" \
         --build-arg COMPOSER_VERSION="${composerVersion}" \
+        --build-arg USER_UID="${userUid}" \
         -t test-image \
         -f Dockerfile.test "${contextDir}"
 }
