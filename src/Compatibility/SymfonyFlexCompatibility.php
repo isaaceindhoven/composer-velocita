@@ -6,13 +6,18 @@ namespace ISAAC\Velocita\Composer\Compatibility;
 
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
+use Composer\Util\HttpDownloader;
+use InvalidArgumentException;
 use ReflectionException;
 use ReflectionObject;
 use ReflectionProperty;
 use RuntimeException;
+use Symfony\Flex\Downloader;
 use Symfony\Flex\Flex;
+use Symfony\Flex\ParallelDownloader;
 use UnexpectedValueException;
 
+use function get_class;
 use function sprintf;
 
 /**
@@ -35,27 +40,23 @@ class SymfonyFlexCompatibility implements CompatibilityFix
     public function applyPluginFix(PluginInterface $plugin): void
     {
         if (!$plugin instanceof Flex) {
-            throw new UnexpectedValueException('Plugin must be instance of Flex');
+            throw new InvalidArgumentException('Plugin must be instance of Flex');
         }
 
+        $io = $this->compatibilityDetector->getIo();
         $downloaderProperty = $this->getAccessibleProperty($plugin, 'downloader');
         $downloader = $downloaderProperty->getValue($plugin);
 
         $rfsProperty = $this->getAccessibleProperty($downloader, 'rfs');
-        $oldRfs = $rfsProperty->getValue($downloader);
-        if ($oldRfs instanceof SymfonyFlexFilesystem) {
-            return;
-        }
+        $rfs = $rfsProperty->getValue($downloader);
 
-        $io = $this->compatibilityDetector->getIo();
-        $disableTlsProperty = $this->getAccessibleProperty($oldRfs, 'disableTls');
-        $rfsProperty->setValue($downloader, new SymfonyFlexFilesystem(
-            $this->compatibilityDetector->getUrlMapper(),
-            $io,
-            $this->compatibilityDetector->getComposer()->getConfig(),
-            $oldRfs->getOptions(),
-            $disableTlsProperty->getValue($oldRfs)
-        ));
+        if ($rfs instanceof HttpDownloader) {
+            $this->applyHttpDownloaderFix($io, $downloader, $rfs, $rfsProperty);
+        } elseif ($rfs instanceof ParallelDownloader) {
+            $this->applyParallelDownloaderFix($io, $downloader, $rfs, $rfsProperty);
+        } else {
+            throw new UnexpectedValueException(sprintf('Unsupported Symfony Flex RFS: %s', get_class($rfs)));
+        }
 
         $io->write(sprintf('%s(): successfully wrapped Flex RFS', __METHOD__), true, IOInterface::DEBUG);
     }
@@ -66,9 +67,56 @@ class SymfonyFlexCompatibility implements CompatibilityFix
         try {
             $reflectionProperty = $reflectionObject->getProperty($propertyName);
         } catch (ReflectionException $e) {
-            throw new RuntimeException(sprintf('Property `%s` could not be found', $propertyName), 0, $e);
+            throw new RuntimeException(
+                sprintf('Property `%s::$%s` could not be found', get_class($object), $propertyName),
+                0,
+                $e
+            );
         }
         $reflectionProperty->setAccessible(true);
         return $reflectionProperty;
+    }
+
+    /**
+     * ParallelDownloader is used in Composer <2.0.0.
+     */
+    protected function applyParallelDownloaderFix(
+        IOInterface $io,
+        Downloader $downloader,
+        ParallelDownloader $rfs,
+        ReflectionProperty $rfsProperty
+    ): void {
+        // Already patched?
+        if ($rfs instanceof SymfonyFlexFilesystem) {
+            return;
+        }
+
+        $rfsProperty->setValue($downloader, new SymfonyFlexFilesystem(
+            $this->compatibilityDetector->getUrlMapper(),
+            $io,
+            $this->compatibilityDetector->getComposer()->getConfig(),
+            $rfs->getOptions(),
+            $this->getAccessibleProperty($rfs, 'disableTls')->getValue($rfs)
+        ));
+    }
+
+    protected function applyHttpDownloaderFix(
+        IOInterface $io,
+        Downloader $downloader,
+        HttpDownloader $rfs,
+        ReflectionProperty $rfsProperty
+    ): void {
+        // Already patched?
+        if ($rfs instanceof SymfonyFlexHttpDownloader) {
+            return;
+        }
+
+        $rfsProperty->setValue($downloader, new SymfonyFlexHttpDownloader(
+            $this->compatibilityDetector->getUrlMapper(),
+            $io,
+            $this->compatibilityDetector->getComposer()->getConfig(),
+            $rfs->getOptions(),
+            $this->getAccessibleProperty($rfs, 'rfs')->getValue($rfs)->isTlsDisabled()
+        ));
     }
 }
