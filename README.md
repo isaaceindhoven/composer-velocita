@@ -11,7 +11,7 @@ Fast and reliable Composer package downloads using [Velocita](https://github.com
 
 ### Prerequisites
 
-* PHP 7.2 or newer
+* PHP 7.3 or newer
 * A running Velocita instance
 * Composer 1 or 2
 
@@ -52,7 +52,7 @@ composer global remove isaac/composer-velocita
 
 ## Authors
 
-* Jelle Raaijmakers - [jelle.raaijmakers@isaac.nl](mailto:jelle.raaijmakers@isaac.nl) / [GMTA](https://github.com/GMTA)
+* Jelle Raaijmakers - [jelle@gmta.nl](mailto:jelle@gmta.nl) / [GMTA](https://github.com/GMTA)
 
 ## Contributing
 
