@@ -27,7 +27,7 @@ disableVelocita() {
     composer velocita:disable
 }
 
-echo '{"require":{"phpunit/phpunit":"^8.5"}}' > composer.json
+echo '{"require":{"phpunit/phpunit":"^9.5"}}' > composer.json
 composer install --no-interaction --no-autoloader --no-suggest
 
 # Vanilla
@@ -40,7 +40,7 @@ runInstall /output/velocita-output.txt
 disableVelocita
 
 # Symfony Flex
-composer global require symfony/flex:^1.9
+composer global require symfony/flex:^1.12
 runInstall /output/flex-output.txt
 
 # ISAAC Velocita + Symfony Flex

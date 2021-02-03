@@ -10,8 +10,8 @@ if [ -z "${velocitaUrl}" ]; then
     exit 1
 fi
 
-phpVersions=(7.2 7.3 7.4)
-composerVersions=(1.9.3 1.10.13 2.0.0-RC1)
+phpVersions=(7.3 7.4 8.0)
+composerVersions=(1.9.3 1.10.20 2.0.9)
 
 buildImage() {
     local phpVersion=$1
