@@ -44,14 +44,37 @@ class SymfonyFlexHttpDownloader extends HttpDownloader
      */
     public function get($url, $options = [])
     {
+        return parent::get($this->mapUrl($url, __METHOD__), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @param array<int|string, mixed> $options
+     */
+    public function add($url, $options = [])
+    {
+        return parent::add($this->mapUrl($url, __METHOD__), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @param array<int|string, mixed> $options
+     */
+    public function copy($url, $to, $options = [])
+    {
+        return parent::copy($this->mapUrl($url, __METHOD__), $to, $options);
+    }
+
+    protected function mapUrl(string $url, string $methodName): string
+    {
         $patchedUrl = $this->urlMapper->applyMappings($url);
         if ($patchedUrl !== $url) {
             $this->io->write(
-                sprintf('%s(url=%s): mapped to %s', __METHOD__, $url, $patchedUrl),
+                sprintf('%s(url=%s): mapped to %s', $methodName, $url, $patchedUrl),
                 true,
-                IOInterface::DEBUG
+                IOInterface::DEBUG,
             );
         }
-        return parent::get($patchedUrl, $options);
+        return $patchedUrl;
     }
 }
