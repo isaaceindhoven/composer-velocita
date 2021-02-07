@@ -9,12 +9,22 @@ echo "PHP ${phpVersion} - Composer ${composerVersion}"
 echo '----------'
 echo
 
-runInstall() {
-    local outputPath="$1"
-
+cleanup() {
     rm -rf vendor
     composer clear-cache
-    composer install --no-interaction --no-autoloader --profile -vvv 2>&1 | tee "${outputPath}"
+}
+
+runInstall() {
+    local outputPath="$1"
+    cleanup
+    composer install --no-interaction --no-autoloader --no-scripts --profile -vvv 2>&1 | tee "${outputPath}"
+}
+
+runCreateProject() {
+    local packageName="$1"
+    local outputPath="$2"
+    cleanup
+    composer create-project --no-interaction --profile -vvv "${packageName}" project 2>&1 | tee "${outputPath}"
 }
 
 installVelocita() {
@@ -33,18 +43,22 @@ disableVelocita() {
 echo '{"require":{"phpunit/phpunit":"^9.5"}}' > composer.json
 
 # Vanilla
-runInstall /output/vanilla-output.txt
+runInstall /output/vanilla-install-output.txt
 
-# ISAAC Velocita
+# Velocita
 installVelocita
 enableVelocita
-runInstall /output/velocita-output.txt
+runInstall /output/velocita-install-output.txt
 disableVelocita
 
 # Symfony Flex
 composer global require symfony/flex:^1.12
-runInstall /output/flex-output.txt
+runInstall /output/flex-install-output.txt
 
-# ISAAC Velocita + Symfony Flex
+# Velocita + Symfony Flex
 enableVelocita
-runInstall /output/velocita-flex-output.txt
+runInstall /output/velocita-flex-install-output.txt
+
+# Velocita + Symfony Flex create-project
+composer global remove symfony/flex
+runCreateProject symfony/skeleton:v5.2.99 /output/velocita-create-project-output.txt
