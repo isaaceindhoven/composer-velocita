@@ -10,7 +10,7 @@ echo '----------'
 echo
 
 cleanup() {
-    rm -rf vendor
+    rm -rf project vendor
     composer clear-cache
 }
 
@@ -42,23 +42,28 @@ disableVelocita() {
 
 echo '{"require":{"phpunit/phpunit":"^9.5"}}' > composer.json
 
-# Vanilla
+# Vanilla install
 runInstall /output/vanilla-install-output.txt
 
-# Velocita
+# Velocita install
 installVelocita
 enableVelocita
 runInstall /output/velocita-install-output.txt
-disableVelocita
 
-# Symfony Flex
+# Symfony Flex install
+disableVelocita
 composer global require symfony/flex:^1.12
 runInstall /output/flex-install-output.txt
 
-# Velocita + Symfony Flex
+# Velocita + Symfony Flex install
 enableVelocita
 runInstall /output/velocita-flex-install-output.txt
+composer global remove symfony/flex
+
+# Vanilla create-project
+disableVelocita
+runCreateProject symfony/skeleton:v5.2.99 /output/vanilla-create-project-output.txt
 
 # Velocita + Symfony Flex create-project
-composer global remove symfony/flex
+enableVelocita
 runCreateProject symfony/skeleton:v5.2.99 /output/velocita-create-project-output.txt
