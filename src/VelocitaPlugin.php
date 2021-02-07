@@ -33,7 +33,6 @@ use function sprintf;
 
 use const PHP_INT_MAX;
 
-// phpcs:ignore ObjectCalisthenics.Metrics.MethodPerClassLimit.ObjectCalisthenics\Sniffs\Metrics\MethodPerClassLimitSniff
 class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     protected const CONFIG_FILE = 'velocita.json';
