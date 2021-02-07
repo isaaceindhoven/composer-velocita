@@ -61,11 +61,9 @@ class UrlMapper
     {
         $matches = [];
         if (preg_match(static::GITHUB_REGEX, $url, $matches) === 1) {
-            return sprintf(
-                'https://codeload.github.com/%s/legacy.zip/%s',
-                $matches['package'],
-                $matches['hash']
-            );
+            $package = $matches['package'];
+            $hash = $matches['hash'];
+            return sprintf('https://codeload.github.com/%s/legacy.zip/%s', $package, $hash);
         }
         return $url;
     }

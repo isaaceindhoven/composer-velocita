@@ -67,11 +67,8 @@ class SymfonyFlexCompatibility implements CompatibilityFix
         try {
             $reflectionProperty = $reflectionObject->getProperty($propertyName);
         } catch (ReflectionException $e) {
-            throw new RuntimeException(
-                sprintf('Property `%s::$%s` could not be found', get_class($object), $propertyName),
-                0,
-                $e
-            );
+            $className = get_class($object);
+            throw new RuntimeException(sprintf('Unknown property `%s::$%s`', $className, $propertyName), 0, $e);
         }
         $reflectionProperty->setAccessible(true);
         return $reflectionProperty;
@@ -96,7 +93,7 @@ class SymfonyFlexCompatibility implements CompatibilityFix
             $io,
             $this->compatibilityDetector->getComposer()->getConfig(),
             $rfs->getOptions(),
-            $this->getAccessibleProperty($rfs, 'disableTls')->getValue($rfs)
+            $this->getAccessibleProperty($rfs, 'disableTls')->getValue($rfs),
         ));
     }
 
@@ -116,7 +113,7 @@ class SymfonyFlexCompatibility implements CompatibilityFix
             $io,
             $this->compatibilityDetector->getComposer()->getConfig(),
             $rfs->getOptions(),
-            $this->getAccessibleProperty($rfs, 'rfs')->getValue($rfs)->isTlsDisabled()
+            $this->getAccessibleProperty($rfs, 'rfs')->getValue($rfs)->isTlsDisabled(),
         ));
     }
 }
