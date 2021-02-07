@@ -19,7 +19,7 @@ runInstall() {
 
 installVelocita() {
     composer global config repositories.velocita-src path /usr/src/velocita/
-    composer global require isaac/composer-velocita:@dev
+    composer global require isaac/composer-velocita @dev
 }
 
 enableVelocita() {

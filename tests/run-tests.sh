@@ -11,7 +11,7 @@ if [ -z "${velocitaUrl}" ]; then
 fi
 
 phpVersions=(7.3 7.4 8.0)
-composerVersions=(1.9.3 1.10.20 2.0.9)
+composerVersions=(2.0.9)
 
 buildImage() {
     local phpVersion=$1
@@ -44,9 +44,7 @@ runTestSuite() {
 
 for phpVersion in "${phpVersions[@]}"; do
     for composerVersion in "${composerVersions[@]}"; do
-        if [[ ! "${phpVersion}" =~ ^8\. ]] || [[ ! "${composerVersion}" =~ ^1\.9\. ]]; then
-            runTestSuite "${phpVersion}" "${composerVersion}"
-        fi
+        runTestSuite "${phpVersion}" "${composerVersion}"
     done
 done
 
