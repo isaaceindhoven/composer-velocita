@@ -26,7 +26,6 @@ use LogicException;
 use RuntimeException;
 use UnexpectedValueException;
 
-use function file_get_contents;
 use function is_array;
 use function json_decode;
 use function sprintf;
@@ -170,12 +169,13 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
 
     protected function getRemoteConfig(string $url): RemoteConfig
     {
+        $httpDownloader = $this->composer->getLoop()->getHttpDownloader();
         $remoteConfigUrl = sprintf(static::REMOTE_CONFIG_URL, $url);
-        $remoteConfigJSON = file_get_contents($remoteConfigUrl);
-        if ($remoteConfigJSON === false) {
-            throw new RuntimeException(sprintf('Remote configuration at %s unavailable', $remoteConfigUrl));
+        $response = $httpDownloader->get($remoteConfigUrl);
+        if ($response->getStatusCode() !== 200) {
+            throw new RuntimeException(sprintf('Unable to retrieve the remote configuration at %s', $remoteConfigUrl));
         }
-        $remoteConfigData = json_decode($remoteConfigJSON, true);
+        $remoteConfigData = json_decode($response->getBody(), true);
         if (!is_array($remoteConfigData)) {
             throw new UnexpectedValueException('Remote configuration is formatted incorrectly');
         }
