@@ -14,7 +14,7 @@ runInstall() {
 
     rm -rf vendor
     composer clear-cache
-    composer install --no-interaction --no-autoloader --no-suggest --profile -vvv 2>&1 | tee "${outputPath}"
+    composer install --no-interaction --no-autoloader --profile -vvv 2>&1 | tee "${outputPath}"
 }
 
 installVelocita() {
