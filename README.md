@@ -5,15 +5,15 @@
 ![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/isaac/composer-velocita)
 [![License](https://img.shields.io/github/license/isaaceindhoven/composer-velocita)](https://github.com/isaaceindhoven/composer-velocita/blob/master/LICENSE)
 
-Fast and reliable Composer package downloads using [Velocita](https://github.com/isaaceindhoven/velocita): a caching
-reverse proxy that does not require you to modify your projects.
+Fast and reliable Composer package downloads using Velocita: a caching reverse proxy that does not require you to
+modify your projects.
 
 ## Getting Started
 
 ### Prerequisites
 
 * PHP 7.3 or newer
-* A running Velocita instance
+* A running [Velocita](https://github.com/isaaceindhoven/velocita) instance
 * Composer 1 or 2
 
 ### Installation
