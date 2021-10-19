@@ -14,7 +14,7 @@ modify your projects.
 
 * PHP 7.3 or newer
 * A running [Velocita](https://github.com/isaaceindhoven/velocita) instance
-* Composer 1 or 2
+* Composer 2
 
 ### Installation
 
@@ -24,12 +24,6 @@ without having to add it to your project's `composer.json`.
 ```
 composer global require isaac/composer-velocita
 composer velocita:enable https://url.to.your.velocita.tld/
-```
-
-NOTE: when using Composer 1.10.5 or lower, you need to explicitly pass a version constraint of `^2`:
-
-```
-composer global require isaac/composer-velocita:^2
 ```
 
 ### Usage
