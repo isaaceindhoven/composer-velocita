@@ -14,7 +14,6 @@ use ReflectionProperty;
 use RuntimeException;
 use Symfony\Flex\Downloader;
 use Symfony\Flex\Flex;
-use Symfony\Flex\ParallelDownloader;
 use UnexpectedValueException;
 
 use function get_class;
@@ -52,8 +51,6 @@ class SymfonyFlexCompatibility implements CompatibilityFix
 
         if ($rfs instanceof HttpDownloader) {
             $this->applyHttpDownloaderFix($io, $downloader, $rfs, $rfsProperty);
-        } elseif ($rfs instanceof ParallelDownloader) {
-            $this->applyParallelDownloaderFix($io, $downloader, $rfs, $rfsProperty);
         } else {
             throw new UnexpectedValueException(sprintf('Unsupported Symfony Flex RFS: %s', get_class($rfs)));
         }
@@ -72,29 +69,6 @@ class SymfonyFlexCompatibility implements CompatibilityFix
         }
         $reflectionProperty->setAccessible(true);
         return $reflectionProperty;
-    }
-
-    /**
-     * ParallelDownloader is used in Composer <2.0.0.
-     */
-    protected function applyParallelDownloaderFix(
-        IOInterface $io,
-        Downloader $downloader,
-        ParallelDownloader $rfs,
-        ReflectionProperty $rfsProperty
-    ): void {
-        // Already patched?
-        if ($rfs instanceof SymfonyFlexFilesystem) {
-            return;
-        }
-
-        $rfsProperty->setValue($downloader, new SymfonyFlexFilesystem(
-            $this->compatibilityDetector->getUrlMapper(),
-            $io,
-            $this->compatibilityDetector->getComposer()->getConfig(),
-            $rfs->getOptions(),
-            $this->getAccessibleProperty($rfs, 'disableTls')->getValue($rfs),
-        ));
     }
 
     protected function applyHttpDownloaderFix(
