@@ -40,7 +40,7 @@ disableVelocita() {
     composer velocita:disable
 }
 
-echo '{"require":{"phpunit/phpunit":"^9.5"}}' > composer.json
+echo '{"require":{"phpunit/phpunit":"9.5.10"}}' > composer.json
 
 # Vanilla install
 runInstall /output/vanilla-install-output.txt
@@ -52,7 +52,7 @@ runInstall /output/velocita-install-output.txt
 
 # Symfony Flex install
 disableVelocita
-composer global require symfony/flex:^1.12
+composer global require symfony/flex:1.17.1
 runInstall /output/flex-install-output.txt
 
 # Velocita + Symfony Flex install
@@ -62,8 +62,8 @@ composer global remove symfony/flex
 
 # Vanilla create-project
 disableVelocita
-runCreateProject symfony/skeleton:v5.2.99 /output/vanilla-create-project-output.txt
+runCreateProject symfony/skeleton:v5.3.99 /output/vanilla-create-project-output.txt
 
 # Velocita + Symfony Flex create-project
 enableVelocita
-runCreateProject symfony/skeleton:v5.2.99 /output/velocita-create-project-output.txt
+runCreateProject symfony/skeleton:v5.3.99 /output/velocita-create-project-output.txt

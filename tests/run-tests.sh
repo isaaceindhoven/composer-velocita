@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+pushd $(dirname $0)/../ >/dev/null
+
 velocitaUrl="${1:-}"
 if [ -z "${velocitaUrl}" ]; then
     echo 'Please provide a URL to a running Velocita instance.'
@@ -16,16 +18,15 @@ composerVersions=(2.0.11)
 buildImage() {
     local phpVersion=$1
     local composerVersion=$2
-
-    local contextDir=$(dirname $0)/../
     local userUid=$(id -u)
 
-    DOCKER_BUILDKIT=1 docker build \
+    docker build \
         --build-arg PHP_VERSION="${phpVersion}" \
         --build-arg COMPOSER_VERSION="${composerVersion}" \
         --build-arg USER_UID="${userUid}" \
         -t test-image \
-        -f Dockerfile.test "${contextDir}"
+        -f tests/Dockerfile.test \
+        .
 }
 
 runTestSuite() {
