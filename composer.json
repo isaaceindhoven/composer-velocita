@@ -16,12 +16,12 @@
         "composer-plugin-api": "^2.0"
     },
     "require-dev": {
-        "composer/composer": "^2.0.9",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+        "composer/composer": "^2.1.9",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
         "phpcompatibility/php-compatibility": "^9.3.5",
         "phpstan/phpstan": "^0.12.71",
-        "slevomat/coding-standard": "^6.4.1",
-        "symfony/flex": "^1.12.1"
+        "slevomat/coding-standard": "^7.0.15",
+        "symfony/flex": "^1.17.1"
     },
     "prefer-stable": true,
     "autoload": {
