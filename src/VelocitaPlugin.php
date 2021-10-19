@@ -27,7 +27,6 @@ use RuntimeException;
 use UnexpectedValueException;
 
 use function is_array;
-use function json_decode;
 use function sprintf;
 
 use const PHP_INT_MAX;
@@ -173,9 +172,11 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
         $remoteConfigUrl = sprintf(static::REMOTE_CONFIG_URL, $url);
         $response = $httpDownloader->get($remoteConfigUrl);
         if ($response->getStatusCode() !== 200) {
-            throw new RuntimeException(sprintf('Unable to retrieve the remote configuration at %s', $remoteConfigUrl));
+            throw new RuntimeException(
+                sprintf('Unexpected status code %d for URL %s', $response->getStatusCode(), $remoteConfigUrl)
+            );
         }
-        $remoteConfigData = json_decode($response->getBody(), true);
+        $remoteConfigData = $response->decodeJson();
         if (!is_array($remoteConfigData)) {
             throw new UnexpectedValueException('Remote configuration is formatted incorrectly');
         }
