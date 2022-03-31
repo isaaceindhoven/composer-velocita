@@ -40,7 +40,7 @@ disableVelocita() {
     composer velocita:disable
 }
 
-echo '{"require":{"phpunit/phpunit":"9.5.10"}}' > composer.json
+echo '{"require":{"phpunit/phpunit":"9.5.19"}}' > composer.json
 
 # Vanilla install
 runInstall /output/vanilla-install-output.txt
