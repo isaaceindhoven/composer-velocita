@@ -14,6 +14,7 @@ fi
 
 phpVersions=(7.4 8.0 8.1)
 composerVersions=(2.0.14 2.1.9)
+imageWithTag=velocita-test-image:latest
 
 buildImage() {
     local phpVersion=$1
@@ -24,7 +25,7 @@ buildImage() {
         --build-arg PHP_VERSION="${phpVersion}" \
         --build-arg COMPOSER_VERSION="${composerVersion}" \
         --build-arg USER_UID="${userUid}" \
-        -t test-image \
+        -t "${imageWithTag}" \
         -f tests/Dockerfile.test \
         .
 }
@@ -40,7 +41,7 @@ runTestSuite() {
     docker run -ti \
         --env VELOCITA_URL="${velocitaUrl}" \
         --mount type=bind,source=$(pwd)/${outputDir},target=/output \
-        test-image
+        "${imageWithTag}"
 }
 
 for phpVersion in "${phpVersions[@]}"; do
