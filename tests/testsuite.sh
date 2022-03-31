@@ -45,6 +45,12 @@ echo '{"require":{"phpunit/phpunit":"9.5.10"}}' > composer.json
 # Vanilla install
 runInstall /output/vanilla-install-output.txt
 
+# Configure Composer 2.2.x to allow plugins
+if [[ "${composerVersion}" == 2.2.* ]]; then
+    composer config -g allow-plugins.symfony/flex true
+    composer config -g allow-plugins.isaac/composer-velocita true
+fi
+
 # Velocita install
 installVelocita
 enableVelocita
