@@ -12,7 +12,7 @@ modify your projects.
 
 ### Prerequisites
 
-* PHP 7.3 or newer
+* PHP 7.4 or newer
 * A running [Velocita](https://github.com/isaaceindhoven/velocita) instance
 * Composer 2
 
