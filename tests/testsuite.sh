@@ -58,7 +58,11 @@ runInstall /output/velocita-install-output.txt
 
 # Symfony Flex install
 disableVelocita
-composer global require symfony/flex:1.17.1
+if [[ "${phpVersion}" == 7.4.* ]]; then
+    composer global require symfony/flex:1.18.5
+else
+    composer global require symfony/flex:2.1.6
+fi
 runInstall /output/flex-install-output.txt
 
 # Velocita + Symfony Flex install
