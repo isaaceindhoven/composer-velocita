@@ -71,9 +71,14 @@ runInstall /output/velocita-flex-install-output.txt
 composer global remove symfony/flex
 
 # Vanilla create-project
+if [[ "${phpVersion}" == 7.4.* ]]; then
+    symfonyVersion="v5.4.99"
+else
+    symfonyVersion="v6.0.99"
+fi
 disableVelocita
-runCreateProject symfony/skeleton:v5.3.99 /output/vanilla-create-project-output.txt
+runCreateProject symfony/skeleton:${symfonyVersion} /output/vanilla-create-project-output.txt
 
 # Velocita + Symfony Flex create-project
 enableVelocita
-runCreateProject symfony/skeleton:v5.3.99 /output/velocita-create-project-output.txt
+runCreateProject symfony/skeleton:${symfonyVersion} /output/velocita-create-project-output.txt
