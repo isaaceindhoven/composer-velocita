@@ -7,6 +7,7 @@ namespace ISAAC\Velocita\Composer\Compatibility;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Util\HttpDownloader;
+use Composer\Util\RemoteFilesystem;
 use InvalidArgumentException;
 use ReflectionException;
 use ReflectionObject;
@@ -45,15 +46,17 @@ class SymfonyFlexCompatibility implements CompatibilityFix
         $io = $this->compatibilityDetector->getIo();
         $downloaderProperty = $this->getAccessibleProperty($plugin, 'downloader');
         $downloader = $downloaderProperty->getValue($plugin);
+        if (!$downloader instanceof Downloader) {
+            throw new UnexpectedValueException('Unexpected Symfony Flex downloader');
+        }
 
         $rfsProperty = $this->getAccessibleProperty($downloader, 'rfs');
         $rfs = $rfsProperty->getValue($downloader);
 
-        if ($rfs instanceof HttpDownloader) {
-            $this->applyHttpDownloaderFix($io, $downloader, $rfs, $rfsProperty);
-        } else {
-            throw new UnexpectedValueException(sprintf('Unsupported Symfony Flex RFS: %s', get_class($rfs)));
+        if (!$rfs instanceof HttpDownloader) {
+            throw new UnexpectedValueException('Unsupported Symfony Flex RFS');
         }
+        $this->applyHttpDownloaderFix($io, $downloader, $rfs, $rfsProperty);
 
         $io->write(sprintf('%s(): successfully wrapped Flex RFS', __METHOD__), true, IOInterface::DEBUG);
     }
@@ -74,20 +77,26 @@ class SymfonyFlexCompatibility implements CompatibilityFix
     protected function applyHttpDownloaderFix(
         IOInterface $io,
         Downloader $downloader,
-        HttpDownloader $rfs,
+        HttpDownloader $composerDownloader,
         ReflectionProperty $rfsProperty
     ): void {
         // Already patched?
-        if ($rfs instanceof SymfonyFlexHttpDownloader) {
+        if ($composerDownloader instanceof SymfonyFlexHttpDownloader) {
             return;
+        }
+
+        $composerRemoteFilesystem = $this->getAccessibleProperty($composerDownloader, 'rfs')
+            ->getValue($composerDownloader);
+        if (!$composerRemoteFilesystem instanceof RemoteFilesystem) {
+            throw new UnexpectedValueException('Composer RFS is not RemoteFilesystem');
         }
 
         $rfsProperty->setValue($downloader, new SymfonyFlexHttpDownloader(
             $this->compatibilityDetector->getUrlMapper(),
             $io,
             $this->compatibilityDetector->getComposer()->getConfig(),
-            $rfs->getOptions(),
-            $this->getAccessibleProperty($rfs, 'rfs')->getValue($rfs)->isTlsDisabled(),
+            $composerDownloader->getOptions(),
+            $composerRemoteFilesystem->isTlsDisabled(),
         ));
     }
 }

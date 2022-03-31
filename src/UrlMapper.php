@@ -60,7 +60,7 @@ class UrlMapper
     protected function applyGitHubShortcut(string $url): string
     {
         $matches = [];
-        if (preg_match(static::GITHUB_REGEX, $url, $matches) === 1) {
+        if (preg_match(self::GITHUB_REGEX, $url, $matches) === 1) {
             $package = $matches['package'];
             $hash = $matches['hash'];
             return sprintf('https://codeload.github.com/%s/legacy.zip/%s', $package, $hash);

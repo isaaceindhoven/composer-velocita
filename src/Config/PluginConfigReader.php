@@ -8,6 +8,7 @@ use ISAAC\Velocita\Composer\Exceptions\IOException;
 
 use function array_key_exists;
 use function file_get_contents;
+use function is_array;
 use function is_readable;
 use function json_decode;
 
@@ -43,7 +44,7 @@ class PluginConfigReader
         }
 
         $data = json_decode($data, true);
-        if ($data === null) {
+        if (!is_array($data)) {
             throw new IOException('Could not decode configuration JSON');
         }
 

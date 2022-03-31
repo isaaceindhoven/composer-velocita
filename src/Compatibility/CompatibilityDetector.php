@@ -65,10 +65,10 @@ class CompatibilityDetector
         foreach ($pluginManager->getPlugins() as $plugin) {
             $pluginClass = PluginHelper::getOriginalClassName(get_class($plugin));
 
-            if (!array_key_exists($pluginClass, static::PLUGIN_CLASS_COMPATIBILITY)) {
+            if (!array_key_exists($pluginClass, self::PLUGIN_CLASS_COMPATIBILITY)) {
                 continue;
             }
-            $fixClass = static::PLUGIN_CLASS_COMPATIBILITY[$pluginClass];
+            $fixClass = self::PLUGIN_CLASS_COMPATIBILITY[$pluginClass];
 
             $this->io->write(
                 sprintf('%s(): plugin %s detected; running compatibility fix %s', __METHOD__, $pluginClass, $fixClass),
@@ -88,7 +88,7 @@ class CompatibilityDetector
         $package = $operation->getPackage();
         $packageName = $package->getName();
 
-        if (!array_key_exists($packageName, static::PACKAGE_INSTALL_TRIGGERS)) {
+        if (!array_key_exists($packageName, self::PACKAGE_INSTALL_TRIGGERS)) {
             return;
         }
 
