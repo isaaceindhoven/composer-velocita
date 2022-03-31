@@ -33,7 +33,7 @@ runTestSuite() {
     local phpVersion=$1
     local composerVersion=$2
 
-    local outputDir="results/php-${phpVersion}-composer-${composerVersion}"
+    local outputDir="test-results/php-${phpVersion}-composer-${composerVersion}"
     mkdir -p "${outputDir}"
 
     buildImage "${phpVersion}" "${composerVersion}"
