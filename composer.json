@@ -17,11 +17,11 @@
     },
     "require-dev": {
         "composer/composer": "^2.1.9",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
         "phpcompatibility/php-compatibility": "^9.3.5",
-        "phpstan/phpstan": "^0.12.71",
-        "slevomat/coding-standard": "^7.0.15",
-        "symfony/flex": "^1.17.1"
+        "phpstan/phpstan": "^1.5.3",
+        "slevomat/coding-standard": "^7.1",
+        "symfony/flex": "^1.18.5"
     },
     "prefer-stable": true,
     "autoload": {
