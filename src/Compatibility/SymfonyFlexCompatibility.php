@@ -27,10 +27,7 @@ use function sprintf;
  */
 class SymfonyFlexCompatibility implements CompatibilityFix
 {
-    /**
-     * @var CompatibilityDetector
-     */
-    private $compatibilityDetector;
+    private CompatibilityDetector $compatibilityDetector;
 
     public function __construct(CompatibilityDetector $compatibilityDetector)
     {

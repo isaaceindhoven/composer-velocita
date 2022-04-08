@@ -11,10 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DisableCommand extends BaseCommand
 {
-    /**
-     * @var VelocitaPlugin
-     */
-    protected $plugin;
+    protected VelocitaPlugin $plugin;
 
     public function __construct(VelocitaPlugin $plugin)
     {

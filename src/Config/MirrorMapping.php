@@ -12,14 +12,8 @@ use function sprintf;
 
 class MirrorMapping
 {
-    /**
-     * @var string
-     */
-    protected $url;
-    /**
-     * @var string
-     */
-    protected $path;
+    protected string $url;
+    protected string $path;
 
     /**
      * @param array{url?: string, path?: string} $data

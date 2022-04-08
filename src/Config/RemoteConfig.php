@@ -13,7 +13,7 @@ class RemoteConfig
     /**
      * @var MirrorMapping[]
      */
-    protected $mirrors = [];
+    protected array $mirrors = [];
 
     /**
      * @param array{mirrors?: array{url?: string, path?: string}[]} $data

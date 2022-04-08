@@ -36,35 +36,14 @@ class VelocitaPlugin implements PluginInterface, EventSubscriberInterface, Capab
     protected const CONFIG_FILE = 'velocita.json';
     protected const REMOTE_CONFIG_URL = '%s/mirrors.json';
 
-    /**
-     * @var bool
-     */
-    protected static $enabled = true;
+    protected static bool $enabled = true;
 
-    /**
-     * @var Composer
-     */
-    protected $composer;
-    /**
-     * @var IOInterface
-     */
-    protected $io;
-    /**
-     * @var string
-     */
-    protected $configPath;
-    /**
-     * @var PluginConfig
-     */
-    protected $configuration;
-    /**
-     * @var UrlMapper
-     */
-    protected $urlMapper;
-    /**
-     * @var CompatibilityDetector
-     */
-    protected $compatibilityDetector;
+    protected Composer $composer;
+    protected IOInterface $io;
+    protected string $configPath;
+    protected PluginConfig $configuration;
+    protected UrlMapper $urlMapper;
+    protected CompatibilityDetector $compatibilityDetector;
 
     public function activate(Composer $composer, IOInterface $io): void
     {

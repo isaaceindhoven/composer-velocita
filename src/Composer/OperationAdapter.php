@@ -16,10 +16,7 @@ use UnexpectedValueException;
 
 class OperationAdapter
 {
-    /**
-     * @var OperationInterface
-     */
-    private $operation;
+    private OperationInterface $operation;
 
     public function __construct(OperationInterface $operation)
     {

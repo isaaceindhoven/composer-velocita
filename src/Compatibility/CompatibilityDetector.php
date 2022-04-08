@@ -24,18 +24,9 @@ class CompatibilityDetector
         'Symfony\\Flex\\Flex' => SymfonyFlexCompatibility::class,
     ];
 
-    /**
-     * @var Composer
-     */
-    private $composer;
-    /**
-     * @var IOInterface
-     */
-    private $io;
-    /**
-     * @var UrlMapper
-     */
-    private $urlMapper;
+    private Composer $composer;
+    private IOInterface $io;
+    private UrlMapper $urlMapper;
 
     public function __construct(Composer $composer, IOInterface $io, UrlMapper $urlMapper)
     {

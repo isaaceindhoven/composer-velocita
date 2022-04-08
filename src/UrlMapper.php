@@ -20,11 +20,8 @@ class UrlMapper
     /**
      * @var MirrorMapping[]
      */
-    private $mappings;
-    /**
-     * @var string
-     */
-    private $rootUrl;
+    private array $mappings;
+    private string $rootUrl;
 
     /**
      * @param MirrorMapping[] $mappings

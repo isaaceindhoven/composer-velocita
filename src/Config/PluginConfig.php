@@ -13,14 +13,8 @@ use const FILTER_VALIDATE_URL;
 
 class PluginConfig
 {
-    /**
-     * @var bool
-     */
-    protected $enabled = false;
-    /**
-     * @var ?string
-     */
-    protected $url;
+    protected bool $enabled = false;
+    protected ?string $url;
 
     public function isEnabled(): bool
     {

@@ -12,10 +12,7 @@ use function sprintf;
 
 class InputInterfaceAdapter
 {
-    /**
-     * @var InputInterface
-     */
-    private $input;
+    private InputInterface $input;
 
     public function __construct(InputInterface $input)
     {

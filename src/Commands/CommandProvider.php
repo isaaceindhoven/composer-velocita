@@ -9,10 +9,7 @@ use ISAAC\Velocita\Composer\VelocitaPlugin;
 
 class CommandProvider implements CommandProviderCapability
 {
-    /**
-     * @var VelocitaPlugin
-     */
-    protected $plugin;
+    protected VelocitaPlugin $plugin;
 
     /**
      * @param array{plugin: VelocitaPlugin} $arguments

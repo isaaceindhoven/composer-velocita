@@ -13,14 +13,8 @@ use function sprintf;
 
 class SymfonyFlexHttpDownloader extends HttpDownloader
 {
-    /**
-     * @var UrlMapper
-     */
-    protected $urlMapper;
-    /**
-     * @var IOInterface
-     */
-    protected $io;
+    protected UrlMapper $urlMapper;
+    protected IOInterface $io;
 
     /**
      * @param array<int|string, mixed> $options

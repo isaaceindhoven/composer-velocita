@@ -14,10 +14,7 @@ use const JSON_PRETTY_PRINT;
 
 class PluginConfigWriter
 {
-    /**
-     * @var PluginConfig
-     */
-    private $pluginConfig;
+    private PluginConfig $pluginConfig;
 
     public function __construct(PluginConfig $pluginConfig)
     {
