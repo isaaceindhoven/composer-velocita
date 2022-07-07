@@ -22,6 +22,7 @@ Installation and configuration of the Velocita plugin is global, so you can use 
 without having to add it to your project's `composer.json`.
 
 ```
+composer global config allow-plugins.isaac/composer-velocita true
 composer global require isaac/composer-velocita
 composer velocita:enable https://url.to.your.velocita.tld/
 ```
