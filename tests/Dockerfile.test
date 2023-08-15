@@ -5,7 +5,7 @@ ARG COMPOSER_VERSION
 FROM composer:${COMPOSER_VERSION} AS composer_base
 
 # PHP image
-FROM php:${PHP_VERSION}-cli-alpine3.14
+FROM php:${PHP_VERSION}-cli-alpine3.16
 
 LABEL maintainer="Jelle Raaijmakers <jelle@gmta.nl>"
 
