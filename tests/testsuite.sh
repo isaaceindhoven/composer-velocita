@@ -40,16 +40,14 @@ disableVelocita() {
     composer velocita:disable
 }
 
-echo '{"require":{"phpunit/phpunit":"9.5.19"}}' > composer.json
+echo '{"require":{"phpunit/phpunit":"9.6.10"}}' > composer.json
 
 # Vanilla install
 runInstall /output/vanilla-install-output.txt
 
-# Configure Composer 2.2+ to allow plugins
-if [[ "${composerVersion}" != 2.1.* ]]; then
-    composer config -g allow-plugins.symfony/flex true
-    composer config -g allow-plugins.isaac/composer-velocita true
-fi
+# Configure Composer to allow plugins
+composer config -g allow-plugins.symfony/flex true
+composer config -g allow-plugins.isaac/composer-velocita true
 
 # Velocita install
 installVelocita
@@ -59,9 +57,9 @@ runInstall /output/velocita-install-output.txt
 # Symfony Flex install
 disableVelocita
 if [[ "${phpVersion}" == 7.4.* ]]; then
-    composer global require symfony/flex:1.18.5
+    composer global require symfony/flex:1.20.2
 else
-    composer global require symfony/flex:2.1.6
+    composer global require symfony/flex:2.3.3
 fi
 runInstall /output/flex-install-output.txt
 

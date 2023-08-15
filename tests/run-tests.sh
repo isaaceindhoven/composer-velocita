@@ -12,8 +12,8 @@ if [ -z "${velocitaUrl}" ]; then
     exit 1
 fi
 
-phpVersions=(7.4 8.0 8.1)
-composerVersions=(2.1.14 2.2.14 2.3.7)
+phpVersions=(7.4 8.0 8.1 8.2)
+composerVersions=(2.2.21 2.3.10 2.4.4 2.5.8)
 testImage=velocita-test-image
 
 buildImage() {
