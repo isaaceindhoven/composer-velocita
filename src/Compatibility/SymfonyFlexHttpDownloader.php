@@ -34,6 +34,7 @@ class SymfonyFlexHttpDownloader extends HttpDownloader
 
     /**
      * {@inheritdoc}
+     * @param non-empty-string $url
      * @param array<int|string, mixed> $options
      */
     public function get($url, $options = [])
@@ -43,6 +44,7 @@ class SymfonyFlexHttpDownloader extends HttpDownloader
 
     /**
      * {@inheritdoc}
+     * @param non-empty-string $url
      * @param array<int|string, mixed> $options
      */
     public function add($url, $options = [])
@@ -52,6 +54,7 @@ class SymfonyFlexHttpDownloader extends HttpDownloader
 
     /**
      * {@inheritdoc}
+     * @param non-empty-string $url
      * @param array<int|string, mixed> $options
      */
     public function copy($url, $to, $options = [])
@@ -59,6 +62,11 @@ class SymfonyFlexHttpDownloader extends HttpDownloader
         return parent::copy($this->mapUrl($url, __METHOD__), $to, $options);
     }
 
+    /**
+     * @param non-empty-string $url
+     * @param non-empty-string $methodName
+     * @return non-empty-string
+     */
     protected function mapUrl(string $url, string $methodName): string
     {
         $patchedUrl = $this->urlMapper->applyMappings($url);

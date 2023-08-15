@@ -32,6 +32,10 @@ class UrlMapper
         $this->rootUrl = $rootUrl;
     }
 
+    /**
+     * @param non-empty-string $url
+     * @return non-empty-string
+     */
     public function applyMappings(string $url): string
     {
         $patchedUrl = $this->applyGitHubShortcut($url);
@@ -54,6 +58,10 @@ class UrlMapper
         return $patchedUrl;
     }
 
+    /**
+     * @param non-empty-string $url
+     * @return non-empty-string
+     */
     protected function applyGitHubShortcut(string $url): string
     {
         $matches = [];
