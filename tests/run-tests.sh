@@ -38,7 +38,7 @@ runTestSuite() {
     mkdir -p "${outputDir}"
 
     buildImage "${phpVersion}" "${composerVersion}"
-    docker run -ti \
+    docker run -t \
         --env VELOCITA_URL="${velocitaUrl}" \
         --mount type=bind,source=$(pwd)/${outputDir},target=/output \
         "${testImage}:php-${phpVersion}-composer-${composerVersion}"
