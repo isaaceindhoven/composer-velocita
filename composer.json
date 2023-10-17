@@ -17,11 +17,11 @@
     },
     "require-dev": {
         "composer/composer": "^2.1.9",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "phpcompatibility/php-compatibility": "^9.3.5",
         "phpstan/phpstan": "^1.5.3",
-        "slevomat/coding-standard": "^7.1",
-        "symfony/flex": "^1.18.5"
+        "slevomat/coding-standard": "^8.14",
+        "symfony/flex": "^2.3.3"
     },
     "prefer-stable": true,
     "autoload": {
@@ -30,7 +30,11 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "symfony/flex": true
+        }
     },
     "extra": {
         "class": "ISAAC\\Velocita\\Composer\\VelocitaPlugin"
