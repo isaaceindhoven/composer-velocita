@@ -1,3 +1,18 @@
+Renamed and moved to the GMTA namespace
+===========
+This repository has been archived and is replaced by the [GMTA composer-velocita repository](https://github.com/gmta/composer-velocita).
+
+The Composer package has been replaced by `gmta/composer-velocita`.
+
+To upgrade to the new package, perform the following steps:
+
+```bash
+composer global remove isaac/composer-velocita
+composer global config --unset allow-plugins.isaac/composer-velocita
+composer global config allow-plugins.gmta/composer-velocita true
+composer global require gmta/composer-velocita
+```
+
 # Velocita Composer plugin
 
 [![Packagist Version](https://img.shields.io/packagist/v/isaac/composer-velocita)](https://packagist.org/packages/isaac/composer-velocita)

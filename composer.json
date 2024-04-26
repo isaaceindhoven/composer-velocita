@@ -1,6 +1,7 @@
 {
     "name": "isaac/composer-velocita",
     "description": "Fast and reliable Composer package downloads by using Velocita",
+    "abandoned": "gmta/composer-velocita",
     "keywords": ["composer", "cache", "performance", "speed", "availability", "velocita"],
     "type": "composer-plugin",
     "license": "MIT",
